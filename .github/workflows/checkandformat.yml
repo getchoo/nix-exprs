@@ -2,7 +2,11 @@ name: check and format flake
 
 on:
   pull_request:
+    paths:
+      - '**.nix'
   push:
+    paths:
+      - '**.nix'
   workflow_dispatch:
 
 jobs:
