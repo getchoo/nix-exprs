@@ -8,9 +8,7 @@ see [PACKAGES.md](https://github.com/getchoo/overlay/blob/main/PACKAGES.md)
 
 ## how to use
 
-### on nixos
-
-#### flake configuration:
+### flake configuration:
 
 ```nix
 {
@@ -40,29 +38,40 @@ see [PACKAGES.md](https://github.com/getchoo/overlay/blob/main/PACKAGES.md)
 }
 ```
 
-#### configuration.nix
+### home-manager:
+
+```nix
+{
+  home-manager.users.<name> = let
+    # you can use a flake input here instead as shown in the last example
+    getchoo = builtins.fetchTarball "https://github.com/getchoo/overlay/archive/refs/heads/main.tar.gz";
+  in {nixpkgs.overlays = [getchoo.overlays.default];};
+}
+```
+
+### `configuration.nix`:
 
 ```nix
 _: let
   getchoo = builtins.fetchTarball "https://github.com/getchoo/overlay/archive/refs/heads/main.tar.gz";
 in {
-  nixpkgs.overlays = [getchoo.overlay.default];
+  nixpkgs.overlays = [getchoo.overlays.default];
 }
 ```
 
 ### cli support
 
 `nixpkgs.overlays` does not configure overlays for tools such as `nix(-)run`, `nix(-)shell`, etc.
-the best way to make this overlay available for them is to add it to your flake registry or `~/.config/nixpkgs/overlays.nix`.
+the best way to make this overlay available to them is to add it to your flake registry or `~/.config/nixpkgs/overlays.nix`.
 
-#### flake registry
+#### flake registry:
 
 ```shell
 nix registry add getchoo github:getchoo/overlay
 nix run getchoo#treefetch
 ```
 
-### overlays.nix
+#### overlays.nix:
 
 in `~/.config/nixpkgs/overlays.nix` (or a nix file in `~/.config/nixpkgs/overlays/`):
 
