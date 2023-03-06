@@ -1,4 +1,5 @@
 {
+  lib,
   fetchPypi,
   python3Packages,
 }:
