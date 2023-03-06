@@ -8,7 +8,7 @@ see [PACKAGES.md](https://github.com/getchoo/overlay/blob/main/PACKAGES.md)
 
 ## how to use
 
-### flake configuration:
+### flake configuration
 
 ```nix
 {
@@ -38,7 +38,7 @@ see [PACKAGES.md](https://github.com/getchoo/overlay/blob/main/PACKAGES.md)
 }
 ```
 
-### home-manager:
+### home-manager
 
 ```nix
 {
@@ -49,7 +49,7 @@ see [PACKAGES.md](https://github.com/getchoo/overlay/blob/main/PACKAGES.md)
 }
 ```
 
-### `configuration.nix`:
+### `configuration.nix`
 
 ```nix
 _: let
@@ -61,17 +61,20 @@ in {
 
 ### cli support
 
-`nixpkgs.overlays` does not configure overlays for tools such as `nix(-)run`, `nix(-)shell`, etc.
-the best way to make this overlay available to them is to add it to your flake registry or `~/.config/nixpkgs/overlays.nix`.
+`nixpkgs.overlays` does not configure overlays for tools
+such as `nix(-)run`, `nix(-)shell`, etc.
 
-#### flake registry:
+the best way to make this overlay available to them is to
+add it to your flake registry or `~/.config/nixpkgs/overlays.nix`.
+
+#### flake registry
 
 ```shell
 nix registry add getchoo github:getchoo/overlay
 nix run getchoo#treefetch
 ```
 
-#### overlays.nix:
+#### overlays.nix
 
 in `~/.config/nixpkgs/overlays.nix` (or a nix file in `~/.config/nixpkgs/overlays/`):
 

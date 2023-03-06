@@ -5,12 +5,19 @@
       url = "github:nix-community/naersk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "utils";
+    };
   };
 
   outputs = {
+    self,
     nixpkgs,
     utils,
     naersk,
+    pre-commit-hooks,
     ...
   }: let
     supportedSystsems = with utils.lib.system; [
@@ -32,7 +39,27 @@
     utils.lib.eachSystem supportedSystsems (system: let
       pkgs = import nixpkgs {inherit system;};
     in {
+      checks = {
+        pre-commit-check = pre-commit-hooks.lib.${system}.run {
+          src = ./.;
+          hooks = {
+            # formatting is taken care of by gh actions :)
+            deadnix.enable = true;
+            markdownlint.enable = true;
+          };
+        };
+      };
+
+      devShells.default = pkgs.mkShell {
+        inherit (self.checks.${system}.pre-commit-check) shellHook;
+        packages = with pkgs; [
+          nodePackages.markdownlint-cli
+          deadnix
+        ];
+      };
+
       formatter = pkgs.alejandra;
+
       packages = let
         p = packageSet pkgs;
       in
