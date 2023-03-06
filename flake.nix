@@ -20,8 +20,10 @@
       aarch64-darwin
     ];
     packageSet = pkgs:
-      with pkgs; {
+      with pkgs; rec {
         treefetch = callPackage ./pkgs/treefetch.nix {inherit naersk;};
+        material-color-utilities = callPackage ./pkgs/material-color-utilities.nix {};
+        gradience = callPackage ./pkgs/gradience.nix {inherit material-color-utilities;};
       };
     overrides = prev: {
       discord-canary = import ./pkgs/discord-canary.nix prev;
