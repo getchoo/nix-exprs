@@ -20,7 +20,7 @@
     pre-commit-hooks,
     ...
   }: let
-    supportedSystsems = with utils.lib.system; [
+    supportedSystems = with utils.lib.system; [
       x86_64-linux
       x86_64-darwin
       aarch64-linux
@@ -31,12 +31,13 @@
         treefetch = callPackage ./pkgs/treefetch.nix {inherit naersk;};
         material-color-utilities = callPackage ./pkgs/material-color-utilities.nix {};
         gradience = callPackage ./pkgs/gradience.nix {inherit material-color-utilities;};
+        swhkd = callPackage ./pkgs/swhkd.nix {inherit naersk;};
       };
     overrides = prev: {
       discord-canary = import ./pkgs/discord-canary.nix prev;
     };
   in
-    utils.lib.eachSystem supportedSystsems (system: let
+    utils.lib.eachSystem supportedSystems (system: let
       pkgs = import nixpkgs {inherit system;};
     in {
       checks = {
