@@ -35,6 +35,7 @@
         vim-just = callPackage ./pkgs/vim-just.nix {};
       };
     overrides = prev: {
+      discord = import ./pkgs/discord.nix prev;
       discord-canary = import ./pkgs/discord-canary.nix prev;
     };
   in
