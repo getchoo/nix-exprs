@@ -32,6 +32,7 @@
         material-color-utilities = callPackage ./pkgs/material-color-utilities.nix {};
         gradience = callPackage ./pkgs/gradience.nix {inherit material-color-utilities;};
         swhkd = callPackage ./pkgs/swhkd.nix {inherit naersk;};
+        vim-just = callPackage ./pkgs/vim-just.nix {};
       };
     overrides = prev: {
       discord-canary = import ./pkgs/discord-canary.nix prev;
