@@ -2,10 +2,6 @@
 
 my personal nix overlay :)
 
-## current packages
-
-see [PACKAGES.md](https://github.com/getchoo/overlay/blob/main/PACKAGES.md)
-
 ## how to use
 
 ### flake configuration

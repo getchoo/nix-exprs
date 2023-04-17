@@ -5,75 +5,48 @@
   };
 
   inputs = {
-    utils.url = "github:numtide/flake-utils";
-    naersk = {
-      url = "github:nix-community/naersk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    pre-commit-hooks = {
-      url = "github:cachix/pre-commit-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "utils";
+    nixpkgs.url = "nixpkgs/nixos-unstable-small";
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    utils,
-    naersk,
-    pre-commit-hooks,
-    ...
-  }: let
-    supportedSystems = with utils.lib.system; [
-      x86_64-linux
-      x86_64-darwin
-      aarch64-linux
-      aarch64-darwin
+  outputs = {nixpkgs, ...}: let
+    systems = [
+      "x86_64-linux"
+      "x86_64-darwin"
+      "aarch64-linux"
+      "aarch64-darwin"
     ];
+
+    forAllSystems = nixpkgs.lib.genAttrs systems;
+    nixpkgsFor = forAllSystems (system: import nixpkgs {inherit system;});
+
     packageSet = pkgs:
       with pkgs; rec {
-        treefetch = callPackage ./pkgs/treefetch.nix {inherit naersk;};
+        treefetch = callPackage ./pkgs/treefetch.nix {};
         material-color-utilities = callPackage ./pkgs/material-color-utilities.nix {};
         gradience = callPackage ./pkgs/gradience.nix {inherit material-color-utilities;};
-        swhkd = callPackage ./pkgs/swhkd.nix {inherit naersk;};
+        swhkd = callPackage ./pkgs/swhkd {};
         vim-just = callPackage ./pkgs/vim-just.nix {};
       };
+
     overrides = prev: {
       discord = import ./pkgs/discord.nix prev;
       discord-canary = import ./pkgs/discord-canary.nix prev;
     };
-  in
-    utils.lib.eachSystem supportedSystems (system: let
-      pkgs = import nixpkgs {inherit system;};
-    in {
-      checks = {
-        pre-commit-check = pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            # formatting is taken care of by gh actions :)
-            deadnix.enable = true;
-            markdownlint.enable = true;
-          };
-        };
-      };
+  in {
+    formatter = forAllSystems (system: nixpkgsFor.${system}.alejandra);
 
-      devShells.default = pkgs.mkShell {
-        inherit (self.checks.${system}.pre-commit-check) shellHook;
-        packages = with pkgs; [
-          nodePackages.markdownlint-cli
-          deadnix
-        ];
-      };
-
-      formatter = pkgs.alejandra;
-
-      packages = let
+    packages = forAllSystems (
+      system: let
+        pkgs = nixpkgsFor.${system};
         p = packageSet pkgs;
       in
-        p // {default = p.treefetch;};
-    })
-    // {
-      overlays.default = final: prev: packageSet final // overrides prev;
-    };
+        p // {default = p.treefetch;}
+    );
+
+    overlays.default = final: prev: packageSet final // overrides prev;
+  };
 }
