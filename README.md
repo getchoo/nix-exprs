@@ -1,8 +1,10 @@
-# overlay
-
-my personal nix overlay :)
+# nix-exprs
 
 ## how to use
+
+### library
+> **Note**
+> coming soon
 
 ### flake configuration
 
