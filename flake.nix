@@ -26,8 +26,6 @@
     packageSet = pkgs:
       with pkgs; rec {
         treefetch = callPackage ./pkgs/treefetch.nix {};
-        material-color-utilities = callPackage ./pkgs/material-color-utilities.nix {};
-        gradience = callPackage ./pkgs/gradience.nix {inherit material-color-utilities;};
         swhkd = callPackage ./pkgs/swhkd {};
         vim-just = callPackage ./pkgs/vim-just.nix {};
       };

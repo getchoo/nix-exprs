@@ -19,7 +19,9 @@ in
       sha256 = "sha256-FDiulTit492KwV46A3qwjHQwzpjVJvIXTfTrMufXd5k=";
     };
 
-    cargoLock.lockFile = "${src}/Cargo.lock";
+    cargoLock = {
+      lockFile = "${src}/Cargo.lock";
+    };
 
     meta = {
       description = "A plant-based system fetch tool made with Rust.";
