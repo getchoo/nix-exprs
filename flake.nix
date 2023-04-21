@@ -45,6 +45,8 @@
         p // {default = p.treefetch;}
     );
 
+    lib = import ./lib nixpkgs.lib;
+
     overlays.default = final: prev: packageSet final // overrides prev;
   };
 }
