@@ -1,4 +1,6 @@
 {
+  description = "getchoo's nix expressions";
+
   nixConfig = {
     extra-substituters = ["https://nix-community.cachix.org"];
     extra-trusted-public-keys = ["nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="];
@@ -36,6 +38,13 @@
     };
   in {
     formatter = forAllSystems (system: nixpkgsFor.${system}.alejandra);
+
+    herculesCI = {
+      ciSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+    };
 
     packages = forAllSystems (
       system: let
