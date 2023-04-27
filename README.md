@@ -2,7 +2,13 @@
 
 ## how to use
 
+### enable cachix
+
+i have a binary cache at <https://getchoo.cachix.org>, make sure to enable it
+in your flake or nixos/darwin config
+
 ### library
+
 > **Note**
 > coming soon
 
