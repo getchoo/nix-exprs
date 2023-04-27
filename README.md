@@ -5,7 +5,7 @@
 ### enable cachix
 
 i have a binary cache at <https://getchoo.cachix.org>, make sure to enable it
-in your flake or nixos/darwin config
+in your flake or nixos/darwin config.
 
 ### library
 
@@ -42,24 +42,25 @@ in your flake or nixos/darwin config
 }
 ```
 
-### home-manager
+### nix channels
 
-```nix
-{
-  home-manager.users.<name> = let
-    # you can use a flake input here instead as shown in the last example
-    getchoo = builtins.fetchTarball "https://github.com/getchoo/overlay/archive/refs/heads/main.tar.gz";
-  in {nixpkgs.overlays = [getchoo.overlays.default];};
-}
+#### adding the channel
+
+```bash
+nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo
+nix-channel --update
 ```
 
-### `configuration.nix`
+#### usage
 
 ```nix
-_: let
-  getchoo = builtins.fetchTarball "https://github.com/getchoo/overlay/archive/refs/heads/main.tar.gz";
+{pkgs, ...}: let
+    getchoo = import <getchoo>;
 in {
-  nixpkgs.overlays = [getchoo.overlays.default];
+    nixpkgs.overlays = [getchoo.overlays.default];
+    environment.systemPackages = with pkgs; [
+        treefetch
+    ];
 }
 ```
 
@@ -80,10 +81,11 @@ nix run getchoo#treefetch
 
 #### overlays.nix
 
-in `~/.config/nixpkgs/overlays.nix` (or a nix file in `~/.config/nixpkgs/overlays/`):
+[add the channel](#adding-the-channel) to your nix profile, then place
+this in `~/.config/nixpkgs/overlays.nix` (or a nix file in `~/.config/nixpkgs/overlays/`):
 
 ```nix
 let
-  getchoo = import (builtins.fetchTarball "https://github.com/getchoo/overlay/archive/refs/heads/main.tar.gz");
+  getchoo = import <getchoo>;
 in [getchoo.overlays.default]
 ```
