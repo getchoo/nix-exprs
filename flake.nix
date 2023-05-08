@@ -26,7 +26,7 @@
     nixpkgsFor = forAllSystems (system: import nixpkgs {inherit system;});
 
     packageSet = pkgs:
-      with pkgs; rec {
+      with pkgs; {
         treefetch = callPackage ./pkgs/treefetch.nix {};
         swhkd = callPackage ./pkgs/swhkd {};
         vim-just = callPackage ./pkgs/vim-just.nix {};
@@ -37,6 +37,12 @@
       discord-canary = import ./pkgs/discord-canary.nix prev;
     };
   in {
+    flakeModules = {
+      default = import ./modules/flake;
+      flakeModules = import ./modules/flake/flakeModules.nix;
+      homeConfigurations = import ./modules/flake/homeConfigurations.nix;
+    };
+
     formatter = forAllSystems (system: nixpkgsFor.${system}.alejandra);
 
     herculesCI = {
