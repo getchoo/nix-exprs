@@ -39,7 +39,6 @@
   in {
     flakeModules = {
       default = import ./modules/flake;
-      flakeModules = import ./modules/flake/flakeModules.nix;
       homeConfigurations = import ./modules/flake/homeConfigurations.nix;
     };
 
