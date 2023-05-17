@@ -62,5 +62,19 @@
     lib = import ./lib nixpkgs.lib;
 
     overlays.default = final: prev: packageSet final // overrides prev;
+
+    templates = let
+      # string -> string -> {}
+      mkTemplate = name: description: {
+        path = builtins.path {
+          name = "${name}-template-src";
+          path = ./templates/${name};
+        };
+        inherit description;
+      };
+    in {
+      basic = mkTemplate "basic" "minimal boilerplate for my flakes";
+      full = mkTemplate "full" "big template for complex flakes (using flake-parts)";
+    };
   };
 }
