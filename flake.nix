@@ -40,6 +40,7 @@
     flakeModules = {
       default = import ./modules/flake;
       homeConfigurations = import ./modules/flake/homeConfigurations.nix;
+      hydraJobs = import ./modules/flake/hydraJobs.nix;
     };
 
     formatter = forAllSystems (system: nixpkgsFor.${system}.alejandra);
