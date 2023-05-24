@@ -28,6 +28,7 @@
     packageSet = pkgs:
       with pkgs; {
         huion = callPackage ./pkgs/huion.nix {};
+        theseus = callPackage ./pkgs/theseus.nix {};
         treefetch = callPackage ./pkgs/treefetch.nix {};
         swhkd = callPackage ./pkgs/swhkd {};
         vim-just = callPackage ./pkgs/vim-just.nix {};
