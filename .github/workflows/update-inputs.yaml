@@ -1,0 +1,31 @@
+name: update inputs
+
+on:
+  schedule:
+    # run every saturday
+    - cron: "0 0 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-lock:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+
+      - name: install nix
+        uses: cachix/install-nix-action@v20
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: update all inputs
+        uses: DeterminateSystems/update-flake-lock@v19
+        with:
+          commit-msg: "flake: update inputs"
+          pr-title: "flake: update all inputs"
+          nix-options: "--accept-flake-config"
+          token: ${{ secrets.GITHUB_TOKEN }}
