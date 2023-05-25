@@ -34,7 +34,7 @@ in
       longDescription = "a display protocol-independent hotkey daemon made in Rust";
       homepage = "https://github.com/waycrate/swhkd";
       license = licenses.bsd2;
-      maintainers = with maintainers; [getchoo];
+      #maintainers = with maintainers; [getchoo];
       platforms = platforms.linux;
     };
   }

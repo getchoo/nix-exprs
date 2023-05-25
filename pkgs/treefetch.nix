@@ -28,7 +28,7 @@ in
       longDescription = "A comfy and fast system fetch tool made in Rust. Tested to be much faster than neofetch and pfetch.";
       homepage = "https://github.com/angelofallars/treefetch";
       license = licenses.gpl3;
-      maintainers = with maintainers; [getchoo];
+      #maintainers = with maintainers; [getchoo];
       platforms = platforms.unix;
     };
   }

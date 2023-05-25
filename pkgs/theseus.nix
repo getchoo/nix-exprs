@@ -122,7 +122,7 @@ in
       '';
       homepage = "https://modrinth.com";
       license = licenses.gpl3Plus;
-      maintainers = [maintainers.getchoo];
+      #maintainers = [maintainers.getchoo];
       platforms = with platforms; linux ++ darwin;
     };
   }

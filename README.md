@@ -1,5 +1,7 @@
 # nix-exprs
 
+[![hydra build status](https://img.shields.io/endpoint?url=https://hydra.mydadleft.me/job/nix-exprs/main/packages.x86_64-linux.treefetch/shield&color=8f97cb&style=flat-square&logo=github)](https://hydra.mydadleft.me/jobset/nix-exprs/main#tabs-jobs)
+
 ## how to use
 
 ### enable cachix
