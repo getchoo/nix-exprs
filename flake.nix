@@ -7,14 +7,18 @@
   };
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable-small";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
     };
   };
 
-  outputs = {nixpkgs, ...}: let
+  outputs = {
+    self,
+    nixpkgs,
+    ...
+  }: let
     systems = [
       "x86_64-linux"
       "x86_64-darwin"
@@ -47,12 +51,17 @@
 
     formatter = forAllSystems (system: nixpkgsFor.${system}.alejandra);
 
-    herculesCI = {
-      ciSystems = [
+    hydraJobs = let
+      supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
-    };
+
+      lib = self.lib {inherit (self) inputs;};
+    in
+      with lib.ci supportedSystems; {
+        packages = mkCompatiblePkgs self.packages;
+      };
 
     packages = forAllSystems (
       system: let

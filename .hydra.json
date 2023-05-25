@@ -1,0 +1,14 @@
+{
+  "main": {
+    "enabled": 1,
+    "type": 1,
+    "hidden": false,
+    "description": "build flake",
+    "checkinterval": 600,
+    "schedulingshares": 100,
+    "enableemail": false,
+    "emailoverride": "",
+    "keepnr": 2,
+    "flake": "github:getchoo/nix-exprs/main"
+  }
+}
