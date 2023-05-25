@@ -19,7 +19,8 @@ in rec {
   # also needs to be editied in order to be picked up
   # by some ci systems
   mkCompatibleApps = apps:
-    mkCompatible (mapAttrs (
+    mkCompatible
+    (mapAttrs (
         _:
           mapAttrs (_: v: {
             program = let
@@ -61,10 +62,22 @@ in rec {
   # to their activationPackage so they can be
   # picked up by hydra
   mkCompatibleHM = configs:
-    filterAttrs (system: _: check system)
-    (mapAttrs (_: mapAttrs (_: deriv: deriv.activationPackage or {})) configs);
+    mkCompatible
+    (mapAttrs (_:
+      mapAttrs (_: deriv:
+        deriv.activationPackage or {}))
+    configs);
 
   # mkCompatible, but for packages
   # meta.platforms is also checked to ensure compatibility
-  mkCompatiblePkgs = mapAttrs (system: filterAttrs (_: deriv: elem system (deriv.meta.platforms or [])));
+  mkCompatiblePkgs = pkgs:
+    mkCompatible
+    (mapAttrs (
+        system:
+          filterAttrs (
+            _: deriv:
+              elem system (deriv.meta.platforms or [])
+          )
+      )
+      pkgs);
 }
