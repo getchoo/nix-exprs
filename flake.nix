@@ -28,6 +28,7 @@
 
     forAllSystems = nixpkgs.lib.genAttrs systems;
     nixpkgsFor = forAllSystems (system: import nixpkgs {inherit system;});
+    forEachSystem = fn: forAllSystems (s: fn nixpkgsFor.${s});
 
     packageSet = pkgs:
       with pkgs; {
@@ -49,7 +50,7 @@
       hydraJobs = import ./modules/flake/hydraJobs.nix;
     };
 
-    formatter = forAllSystems (system: nixpkgsFor.${system}.alejandra);
+    formatter = forEachSystem (pkgs: pkgs.alejandra);
 
     hydraJobs = let
       supportedSystems = [
@@ -63,9 +64,8 @@
         packages = mkCompatiblePkgs self.packages;
       };
 
-    packages = forAllSystems (
-      system: let
-        pkgs = nixpkgsFor.${system};
+    packages = forEachSystem (
+      pkgs: let
         p = packageSet pkgs;
       in
         p // {default = p.treefetch;}
