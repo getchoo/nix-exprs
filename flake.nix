@@ -32,6 +32,7 @@
 
     packageSet = pkgs:
       with pkgs; {
+        cartridges = callPackage ./pkgs/cartridges.nix {};
         huion = callPackage ./pkgs/huion.nix {};
         theseus = callPackage ./pkgs/theseus.nix {};
         treefetch = callPackage ./pkgs/treefetch.nix {};
