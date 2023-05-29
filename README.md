@@ -1,6 +1,6 @@
 # nix-exprs
 
-[![hydra build status](https://img.shields.io/endpoint?url=https://hydra.mydadleft.me/job/nix-exprs/main/packages.x86_64-linux.treefetch/shield&color=8f97cb&style=flat-square&logo=github)](https://hydra.mydadleft.me/jobset/nix-exprs/main#tabs-jobs)
+[![hercules-ci build status](https://img.shields.io/badge/dynamic/json?label=hercules-ci%20builds&query=%24.state&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fgetchoo%2Fnix-exprs%2Fcommits%2Fmain%2Fstatus&color=8f97cb&style=flat-square&logo=github)](https://hercules-ci.com/github/getchoo/nix-exprs)
 
 ## how to use
 

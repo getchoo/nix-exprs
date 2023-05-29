@@ -53,17 +53,23 @@
 
     formatter = forEachSystem (pkgs: pkgs.alejandra);
 
-    hydraJobs = let
-      supportedSystems = [
+    herculesCI = let
+      ciSystems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
 
       lib = self.lib {inherit (self) inputs;};
-    in
-      with lib.ci supportedSystems; {
-        packages = mkCompatiblePkgs self.packages;
+      inherit (lib.ci ciSystems) mkCompatiblePkgs;
+    in {
+      inherit ciSystems;
+
+      onPush.default = {
+        outputs = {
+          packages = mkCompatiblePkgs self.packages;
+        };
       };
+    };
 
     packages = forEachSystem (
       pkgs: let

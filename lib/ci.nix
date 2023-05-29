@@ -43,7 +43,7 @@ in rec {
 
   # mkComaptible, but maps nixosConfigurations
   # to their toplevel build attribute so they can
-  # be picked up by hydra
+  # be picked up by ci
   mkCompatibleCfg = configs:
     filterAttrs (_: config: check config.system)
     (mapAttrs (_: v: v.config.system.build.toplevel) configs);
@@ -60,7 +60,7 @@ in rec {
 
   # mkCompatible, but maps homeConfigurations
   # to their activationPackage so they can be
-  # picked up by hydra
+  # picked up by ci
   mkCompatibleHM = configs:
     mkCompatible
     (mapAttrs (_:
