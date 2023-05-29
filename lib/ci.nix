@@ -77,6 +77,7 @@ in rec {
           filterAttrs (
             _: deriv:
               elem system (deriv.meta.platforms or [])
+              && !(deriv.meta.broken or false)
           )
       )
       pkgs);
