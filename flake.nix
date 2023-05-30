@@ -34,6 +34,7 @@
       with pkgs; {
         cartridges = callPackage ./pkgs/cartridges.nix {};
         huion = callPackage ./pkgs/huion.nix {};
+        mommy = callPackage ./pkgs/mommy.nix {};
         theseus = callPackage ./pkgs/theseus.nix {};
         treefetch = callPackage ./pkgs/treefetch.nix {};
         swhkd = callPackage ./pkgs/swhkd {};
