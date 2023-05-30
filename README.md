@@ -7,7 +7,8 @@
 ### enable cachix
 
 i have a binary cache at <https://getchoo.cachix.org>, make sure to enable it
-in your flake or nixos/darwin config.
+in your flake or nixos/darwin config or use `nix run nixpkgs#cachix use getchoo`
+for cli support.
 
 ### library
 
@@ -20,8 +21,7 @@ in your flake or nixos/darwin config.
 {
   inputs = {
     getchoo = {
-      url = "github:getchoo/overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:getchoo/nix-exprs";
     };
   };
 
@@ -68,20 +68,33 @@ in {
 
 ### cli support
 
-`nixpkgs.overlays` does not configure overlays for tools
-such as `nix(-)run`, `nix(-)shell`, etc.
+this overlay can also be used in the base nix package manager :)
 
-the best way to make this overlay available to them is to
+> **Note**
+> for nixos/nix-darwin users, `nixpkgs.overlays` does not configure
+> overlays for tools such as `nix(-)run`, `nix(-)shell`, etc. so this
+> will also be required for you
+
+the best way to make this overlay available for you is to
 add it to your flake registry or `~/.config/nixpkgs/overlays.nix`.
 
 #### flake registry
 
+this is the preferred way to use this overlay in the cli, as it allows
+for full reproducibility with the flake.
+
+to use this overlay with commands like `nix build/run/shell`, you can
+add it to your flake registry:
+
 ```shell
-nix registry add getchoo github:getchoo/overlay
+nix registry add getchoo github:getchoo/nix-exprs
 nix run getchoo#treefetch
 ```
 
 #### overlays.nix
+
+for those who don't want to use this flake's revision of nixpkgs,
+or do not use flakes, you can also add it as an overlay.
 
 [add the channel](#adding-the-channel) to your nix profile, then place
 this in `~/.config/nixpkgs/overlays.nix` (or a nix file in `~/.config/nixpkgs/overlays/`):
