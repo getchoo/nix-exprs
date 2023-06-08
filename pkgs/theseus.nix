@@ -30,12 +30,12 @@
   inherit (lib) licenses maintainers makeBinPath makeLibraryPath platforms;
   pname = "theseus";
 
-  rev = "9ea548cfe332c56179c9ef4fad58ac7274bcbd13";
+  rev = "e0e9c3f1666d3db220cd8918acfa091ec4eecb36";
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
     inherit rev;
-    sha256 = "sha256-OBczvGVCvrkZjZS1HIYQ41gxqznSC0dOb1nYK0RU8JQ=";
+    sha256 = "sha256-pIJQQAYSQBalW1pQBCirkcxmS6DBGj/E6zKL8/Nc8Ww=";
   };
 
   theseus-frontend = let
