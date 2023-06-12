@@ -35,7 +35,8 @@
         cartridges = callPackage ./pkgs/cartridges.nix {};
         huion = callPackage ./pkgs/huion.nix {};
         mommy = callPackage ./pkgs/mommy.nix {};
-        theseus = callPackage ./pkgs/theseus.nix {};
+        # broken due to upstrea adopting pnpm
+        # theseus = callPackage ./pkgs/theseus.nix {};
         treefetch = callPackage ./pkgs/treefetch.nix {};
         swhkd = callPackage ./pkgs/swhkd {};
         vim-just = callPackage ./pkgs/vim-just.nix {};
