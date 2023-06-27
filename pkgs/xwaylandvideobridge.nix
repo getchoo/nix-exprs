@@ -30,7 +30,7 @@ in
       owner = "system";
       repo = pname;
       rev = "a9c40f8cda1016d20cea80ecdbfc90637c6f24dd";
-      sha256 = "sha256-gfQkOIZegxdFQ9IV2Qp/lLRtfI5/g6bDD3XRBdLh4q0=";
+      sha256 = "sha256-COv3lQuJ4LO6iThAy9lrfYPKkZTkiVSvqBp2xzPHKKw=";
     };
 
     nativeBuildInputs = [
