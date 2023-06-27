@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-lock:
@@ -28,4 +29,4 @@ jobs:
           commit-msg: "flake: update inputs"
           pr-title: "flake: update all inputs"
           nix-options: "--accept-flake-config"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.FLAKE_UPDATE }}
