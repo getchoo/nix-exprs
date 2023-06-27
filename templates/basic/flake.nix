@@ -26,34 +26,14 @@
         overlays = [self.overlays.default];
       });
 
-    packageFn = pkgs: let
-      inherit (pkgs.lib) licenses maintainers platforms;
-    in {
-      hello = pkgs.stdenv.mkDerivation rec {
-        pname = "hello";
-        inherit version;
-
-        src = builtins.path {
-          name = "${pname}-src";
-          path = ./.;
-        };
-
-        installPhase = ''
-          echo "hi" > $out
-        '';
-
-        meta = {
-          description = "";
-          homepage = "";
-          license = licenses.mit;
-          maintainers = [maintainers.getchoo];
-          platforms = platforms.linux;
-        };
-      };
-    };
+    forEachSystem = fn:
+      forAllSystems (system:
+        fn {
+          inherit system;
+          pkgs = nixpkgsFor.${system};
+        });
   in {
-    devShells = forAllSystems (s: let
-      pkgs = nixpkgsFor.${s};
+    devShells = forEachSystem ({pkgs, ...}: let
       inherit (pkgs) mkShell;
     in {
       default = mkShell {
@@ -63,13 +43,32 @@
       };
     });
 
-    formatter = forAllSystems (s: nixpkgsFor.${s}.alejandra);
+    formatter = forEachSystem ({pkgs, ...}: pkgs.alejandra);
 
-    packages = forAllSystems (s: rec {
-      inherit (nixpkgsFor.${s}) hello;
-      default = hello;
+    packages = forEachSystem ({pkgs, ...}: {
+      inherit (pkgs) hello;
+      default = pkgs.hello;
     });
 
-    overlays.default = final: _: packageFn final;
+    overlays.default = _: prev: {
+      hello = prev.stdenv.mkDerivation {
+        pname = "hello";
+        inherit version;
+
+        src = self;
+
+        installPhase = ''
+          echo "hi" > $out
+        '';
+
+        meta = with prev.lib; {
+          description = "";
+          homepage = "";
+          license = licenses.mit;
+          maintainers = [maintainers.getchoo];
+          platforms = platforms.linux;
+        };
+      };
+    };
   };
 }
