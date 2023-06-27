@@ -40,6 +40,7 @@
         treefetch = callPackage ./pkgs/treefetch.nix {};
         swhkd = callPackage ./pkgs/swhkd {};
         vim-just = callPackage ./pkgs/vim-just.nix {};
+        xwaylandvideobridge = callPackage ./pkgs/xwaylandvideobridge.nix {};
       };
 
     overrides = prev: {
