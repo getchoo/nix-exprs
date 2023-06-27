@@ -32,13 +32,13 @@
 in
   stdenv.mkDerivation rec {
     pname = "cartridges";
-    version = "1.5.4";
+    version = "1.5.6";
 
     src = fetchFromGitHub {
       owner = "kra-mo";
       repo = "cartridges";
       rev = "v${version}";
-      sha256 = "sha256-pOGsuhsBZTFcq+1xsHXtBabV8i9pQw3w6UJnVE3EihM=";
+      sha256 = "sha256-Nog3EBfA7WwHKqclijNtaN3NSeggf3G4/BLqArl6JWM=";
     };
 
     buildInputs = [
