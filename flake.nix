@@ -2,8 +2,12 @@
   description = "getchoo's nix expressions";
 
   nixConfig = {
-    extra-substituters = ["https://nix-community.cachix.org"];
-    extra-trusted-public-keys = ["nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="];
+    extra-substituters = [
+      "https://cache.garnix.io"
+    ];
+    extra-trusted-public-keys = [
+      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+    ];
   };
 
   inputs = {
@@ -27,26 +31,18 @@
     ];
 
     forAllSystems = nixpkgs.lib.genAttrs systems;
-    nixpkgsFor = forAllSystems (system: import nixpkgs {inherit system;});
-    forEachSystem = fn: forAllSystems (s: fn nixpkgsFor.${s});
+    nixpkgsFor = forAllSystems (system:
+      import nixpkgs {
+        inherit system;
+        overlays = [self.overlays.default];
+      });
 
-    packageSet = pkgs:
-      with pkgs; {
-        cartridges = callPackage ./pkgs/cartridges.nix {};
-        huion = callPackage ./pkgs/huion.nix {};
-        mommy = callPackage ./pkgs/mommy.nix {};
-        # broken due to upstrea adopting pnpm
-        # theseus = callPackage ./pkgs/theseus.nix {};
-        treefetch = callPackage ./pkgs/treefetch.nix {};
-        swhkd = callPackage ./pkgs/swhkd {};
-        vim-just = callPackage ./pkgs/vim-just.nix {};
-        xwaylandvideobridge = callPackage ./pkgs/xwaylandvideobridge.nix {};
-      };
-
-    overrides = prev: {
-      discord = import ./pkgs/discord.nix prev;
-      discord-canary = import ./pkgs/discord-canary.nix prev;
-    };
+    forEachSystem = fn:
+      forAllSystems (system:
+        fn {
+          inherit system;
+          pkgs = nixpkgsFor.${system};
+        });
   in {
     flakeModules = {
       default = import ./modules/flake;
@@ -54,36 +50,38 @@
       hydraJobs = import ./modules/flake/hydraJobs.nix;
     };
 
-    formatter = forEachSystem (pkgs: pkgs.alejandra);
+    formatter = forEachSystem ({pkgs, ...}: pkgs.alejandra);
 
-    herculesCI = let
+    checks = let
       ciSystems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
 
-      lib = self.lib {inherit (self) inputs;};
-      inherit (lib.ci ciSystems) mkCompatiblePkgs;
-    in {
-      inherit ciSystems;
-
-      onPush.default = {
-        outputs = {
-          packages = mkCompatiblePkgs self.packages;
-        };
-      };
-    };
+      pkgs = (self.lib.ci ciSystems).mkCompatiblePkgs self.packages;
+    in
+      nixpkgs.lib.genAttrs ciSystems (sys: pkgs.${sys});
 
     packages = forEachSystem (
-      pkgs: let
-        p = packageSet pkgs;
+      {pkgs, ...}: let
+        inherit (builtins) attrNames filter listToAttrs map readDir substring;
+        inherit (nixpkgs.lib) removeSuffix;
+
+        pkgNames = filter (p: substring 0 1 p != "_") (attrNames (readDir ./pkgs));
+        pkgs' = map (removeSuffix ".nix") pkgNames;
+
+        p = listToAttrs (map (name: {
+            inherit name;
+            value = pkgs.${name};
+          })
+          pkgs');
       in
         p // {default = p.treefetch;}
     );
 
     lib = import ./lib nixpkgs.lib;
 
-    overlays.default = final: prev: packageSet final // overrides prev;
+    overlays.default = import ./pkgs;
 
     templates = let
       # string -> string -> {}
