@@ -1,4 +1,4 @@
-lib: {inputs, ...}: {
+lib: {
   ci = import ./ci.nix lib;
-  configs = import ./configs.nix inputs;
+  configs = import ./configs.nix;
 }

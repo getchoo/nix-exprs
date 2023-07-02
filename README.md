@@ -1,14 +1,30 @@
 # nix-exprs
 
-[![hercules-ci build status](https://img.shields.io/badge/dynamic/json?label=hercules-ci%20builds&query=%24.state&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fgetchoo%2Fnix-exprs%2Fcommits%2Fmain%2Fstatus&color=8f97cb&style=flat-square&logo=github)](https://hercules-ci.com/github/getchoo/nix-exprs)
+[![built with garnix](https://img.shields.io/badge/Built_with-Garnix-blue?style=flat-square&logo=nixos&link=https%3A%2F%2Fgarnix.io)](https://garnix.io)
 
 ## how to use
 
-### enable cachix
+### enable binary cache
 
-i have a binary cache at <https://getchoo.cachix.org>, make sure to enable it
-in your flake or nixos/darwin config or use `nix run nixpkgs#cachix use getchoo`
-for cli support.
+all packages are built with [garnix](https://garnix.io/), and cached on their servers. you can use this
+yourself by following the instructions [here](https://garnix.io/docs/caching). i would also recommend
+[donating](https://opencollective.com/garnix_io) if you can!
+
+example:
+
+```nix
+{
+  nix.settings = {
+    trusted-substituters = [
+      "https://cache.garnix.io"
+    ];
+
+    trusted-public-keys = [
+      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+    ];
+  }
+}
+```
 
 ### library
 
