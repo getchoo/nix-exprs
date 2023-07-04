@@ -5,8 +5,7 @@ in {
   cartridges = callPackage ./cartridges.nix {};
   huion = callPackage ./huion.nix {};
   mommy = callPackage ./mommy.nix {};
-  ## broken due to upstream adopting pnpm
-  ## theseus = callPackage ./theseus.nix {};
+  theseus = callPackage ./theseus {};
   treefetch = callPackage ./treefetch.nix {};
   swhkd = callPackage ./swhkd {};
   vim-just = callPackage ./vim-just.nix {};
