@@ -3,6 +3,7 @@ final: prev: let
 in {
   # original packages
   cartridges = callPackage ./cartridges.nix {};
+  cfspeedtest = callPackage ./cfspeedtest.nix {};
   huion = callPackage ./huion.nix {};
   mommy = callPackage ./mommy.nix {};
   theseus = callPackage ./theseus {};
