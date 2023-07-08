@@ -4,6 +4,7 @@ in {
   # original packages
   cartridges = callPackage ./cartridges.nix {};
   cfspeedtest = callPackage ./cfspeedtest.nix {};
+  check-pr = callPackage ./check-pr.nix {};
   huion = callPackage ./huion.nix {};
   mommy = callPackage ./mommy.nix {};
   theseus = callPackage ./theseus {};
