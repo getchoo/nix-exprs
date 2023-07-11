@@ -1,6 +1,5 @@
-inputs: {
-  mkNixOS = {
-    name,
+inputs: let
+  mkSystem = name: {
     profile,
     modules ? profile.modules,
     system ? profile.system,
@@ -16,6 +15,9 @@ inputs: {
           else modules ++ profile.modules
         );
     };
+in {
+  inherit mkSystem;
+  mkSystems = builtins.mapAttrs mkSystem;
 
   mkHMUser = {
     name,
