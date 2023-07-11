@@ -15,12 +15,8 @@ inputs: let
           else modules ++ profile.modules
         );
     };
-in {
-  inherit mkSystem;
-  mkSystems = builtins.mapAttrs mkSystem;
 
-  mkHMUser = {
-    name,
+  mkHMUser = name: {
     modules ? [],
     pkgs ? import inputs.nixpkgs {system = "x86_64-linux";},
     extraSpecialArgs ? inputs,
@@ -36,4 +32,8 @@ in {
         ++ ["${inputs.self}/users/${name}/home.nix"]
         ++ modules;
     };
+in {
+  inherit mkHMUser mkSystem;
+  mkHMUsers = builtins.mapAttrs mkHMUser;
+  mkSystems = builtins.mapAttrs mkSystem;
 }
