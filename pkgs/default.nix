@@ -1,4 +1,4 @@
-final: prev: let
+final: _: let
   inherit (final) callPackage;
 in {
   # original packages
@@ -12,8 +12,4 @@ in {
   swhkd = callPackage ./swhkd {};
   vim-just = callPackage ./vim-just.nix {};
   xwaylandvideobridge = callPackage ./xwaylandvideobridge.nix {};
-
-  # modified packages
-  discord = prev.discord.override {withOpenASAR = true;};
-  discord-canary = prev.discord-canary.override {withOpenASAR = true;};
 }
