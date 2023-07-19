@@ -86,10 +86,7 @@
     templates = let
       # string -> string -> {}
       mkTemplate = name: description: {
-        path = builtins.path {
-          name = "${name}-template-src";
-          path = ./templates/${name};
-        };
+        path = "${self}/templates/${name}";
         inherit description;
       };
     in {
