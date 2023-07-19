@@ -50,31 +50,41 @@
       hydraJobs = import ./modules/flake/hydraJobs.nix;
     };
 
-    formatter = forEachSystem ({pkgs, ...}: pkgs.alejandra);
+    formatter = forEachSystem (p: p.pkgs.alejandra);
 
     checks = let
       ciSystems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
-
-      pkgs = (self.lib.ci ciSystems).mkCompatiblePkgs self.packages;
     in
-      nixpkgs.lib.genAttrs ciSystems (sys: pkgs.${sys});
+      nixpkgs.lib.genAttrs ciSystems (sys: self.packages.${sys});
 
     packages = forEachSystem (
-      {pkgs, ...}: let
-        inherit (builtins) attrNames filter listToAttrs map readDir substring;
-        inherit (nixpkgs.lib) removeSuffix;
+      {
+        pkgs,
+        system,
+      }: let
+        inherit (builtins) attrNames elem filter listToAttrs map readDir substring;
+        inherit (nixpkgs.lib) filterAttrs removeSuffix;
 
-        pkgNames = filter (p: substring 0 1 p != "_") (attrNames (readDir ./pkgs));
-        pkgs' = map (removeSuffix ".nix") pkgNames;
+        # filter disabled pkgs
+        avail =
+          filter (p: substring 0 1 p != "_" && p != "default.nix")
+          (attrNames (readDir ./pkgs));
 
-        p = listToAttrs (map (name: {
-            inherit name;
-            value = pkgs.${name};
-          })
-          pkgs');
+        names = map (removeSuffix ".nix") avail;
+
+        p = let
+          derivs = listToAttrs (map (name: {
+              inherit name;
+              value = pkgs.${name};
+            })
+            names);
+        in
+          filterAttrs (_: v:
+            elem system (v.meta.platforms or []))
+          derivs;
       in
         p // {default = p.treefetch;}
     );
