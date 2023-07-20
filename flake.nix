@@ -83,7 +83,7 @@
             names);
         in
           filterAttrs (_: v:
-            elem system (v.meta.platforms or []))
+            elem system (v.meta.platforms or []) && !(v.meta.broken or false))
           derivs;
       in
         p // {default = p.treefetch;}
