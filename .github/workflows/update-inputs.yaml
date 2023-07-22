@@ -18,15 +18,20 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v3
 
-      - name: install nix
-        uses: cachix/install-nix-action@v22
+      - uses: cachix/install-nix-action@v22
         with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          github_access_token: ${{ github.token }}
 
-      - name: update all inputs
-        uses: DeterminateSystems/update-flake-lock@v19
+      - uses: DeterminateSystems/update-flake-lock@v19
+        id: update
         with:
           commit-msg: "flake: update inputs"
           pr-title: "flake: update all inputs"
           nix-options: "--accept-flake-config"
           token: ${{ secrets.FLAKE_UPDATE }}
+
+      - name: auto-merge pull request
+        run: gh pr merge --auto --rebase "$PR_ID"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_ID: ${{ steps.update.outputs.pull-request-number }}
