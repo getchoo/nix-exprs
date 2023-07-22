@@ -28,7 +28,7 @@ jobs:
           commit-msg: "flake: update inputs"
           pr-title: "flake: update all inputs"
           nix-options: "--accept-flake-config"
-          token: ${{ secrets.FLAKE_UPDATE }}
+          token: ${{ github.token }}
 
       - name: auto-merge pull request
         run: gh pr merge --auto --rebase "$PR_ID"
