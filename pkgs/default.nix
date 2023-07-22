@@ -2,7 +2,6 @@ final: _: let
   inherit (final) callPackage;
 in {
   # original packages
-  cartridges = callPackage ./cartridges.nix {};
   cfspeedtest = callPackage ./cfspeedtest.nix {};
   check-pr = callPackage ./check-pr.nix {};
   huion = callPackage ./huion.nix {};
