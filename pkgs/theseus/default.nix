@@ -31,8 +31,8 @@
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "6650cc9ce431b61b5c9a9bf7361b47e4e0e6facf";
-    sha256 = "sha256-lgOhyV6wj/hbRuTyRrtkBI+vD5RYfjZ7ezSzHVAqmzM=";
+    rev = "70aaf6eef983e58f5ac58b3d2f6fe946ea3a3730";
+    sha256 = "sha256-6zRhmCtdDT2fQ23alFPQ4xMCsD9pKJ8yF+ww4sAwFAw=";
   };
 
   theseus-frontend = let
@@ -58,7 +58,7 @@
 in
   rustPlatform.buildRustPackage {
     inherit pname src;
-    version = "2023-07-04";
+    version = "2023-07-22";
 
     postPatch = ''
       substituteInPlace theseus_gui/src-tauri/tauri.conf.json \
