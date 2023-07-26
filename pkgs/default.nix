@@ -6,7 +6,7 @@ in {
   check-pr = callPackage ./check-pr.nix {};
   huion = callPackage ./huion.nix {};
   mommy = callPackage ./mommy.nix {};
-  theseus = callPackage ./theseus {};
+  theseus = callPackage ./theseus.nix {inherit (final.nodePackages) pnpm;};
   treefetch = callPackage ./treefetch.nix {};
   swhkd = callPackage ./swhkd {};
   vim-just = callPackage ./vim-just.nix {};
