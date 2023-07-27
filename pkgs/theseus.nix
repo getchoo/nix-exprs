@@ -32,13 +32,13 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "theseus";
-  version = "2023-07-22";
+  version = "unstable-2023-07-27";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "70aaf6eef983e58f5ac58b3d2f6fe946ea3a3730";
-    sha256 = "sha256-6zRhmCtdDT2fQ23alFPQ4xMCsD9pKJ8yF+ww4sAwFAw=";
+    rev = "744d11f09e4f8cd264b87abe92a390e8a75ba979";
+    sha256 = "sha256-StIZa6M1zc0Cbf4rXcLYEJlXso3ndszc9vmbmYUTywY=";
   };
 
   cargoLock = {
