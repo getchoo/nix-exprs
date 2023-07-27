@@ -23,14 +23,14 @@
 in
   stdenv.mkDerivation rec {
     pname = "xwaylandvideobridge";
-    version = "2023-06-27-unstable";
+    version = "unstable-2023-07-26";
 
     src = fetchFromGitLab {
       domain = "invent.kde.org";
       owner = "system";
       repo = pname;
-      rev = "a9c40f8cda1016d20cea80ecdbfc90637c6f24dd";
-      sha256 = "sha256-COv3lQuJ4LO6iThAy9lrfYPKkZTkiVSvqBp2xzPHKKw=";
+      rev = "014111b4db6298968204fd56d5ce6f691137bf90";
+      sha256 = "sha256-6ro5Y5GSiodzbsiPQls4IAOYGLcLE7j+0eumpW6+HeU=";
     };
 
     nativeBuildInputs = [
