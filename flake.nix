@@ -30,7 +30,9 @@
       "aarch64-darwin"
     ];
 
-    forAllSystems = nixpkgs.lib.genAttrs systems;
+    inherit (nixpkgs) lib;
+
+    forAllSystems = lib.genAttrs systems;
     nixpkgsFor = forAllSystems (system:
       import nixpkgs {
         inherit system;
@@ -52,46 +54,24 @@
 
     formatter = forEachSystem (p: p.pkgs.alejandra);
 
-    checks = let
-      ciSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
-    in
-      nixpkgs.lib.genAttrs ciSystems (sys: self.packages.${sys});
-
     packages = forEachSystem (
       {
         pkgs,
         system,
       }: let
-        inherit (builtins) attrNames elem filter listToAttrs map readDir substring;
-        inherit (nixpkgs.lib) filterAttrs removeSuffix;
-
-        # filter disabled pkgs
-        avail =
-          filter (p: substring 0 1 p != "_" && p != "default.nix")
-          (attrNames (readDir ./pkgs));
-
-        names = map (removeSuffix ".nix") avail;
-
         p = let
-          derivs = listToAttrs (map (name: {
-              inherit name;
-              value = pkgs.${name};
-            })
-            names);
+          packages = import ./pkgs pkgs;
         in
-          filterAttrs (_: v:
-            elem system (v.meta.platforms or []) && !(v.meta.broken or false))
-          derivs;
+          lib.filterAttrs (_: v:
+            builtins.elem system (v.meta.platforms or []) && !(v.meta.broken or false))
+          packages;
       in
         p // {default = p.treefetch;}
     );
 
-    lib = import ./lib nixpkgs.lib;
+    lib = import ./lib lib;
 
-    overlays.default = import ./pkgs;
+    overlays.default = final: _: import ./pkgs final;
 
     templates = let
       # string -> string -> {}
