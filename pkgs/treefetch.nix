@@ -5,7 +5,7 @@
 }:
 rustPlatform.buildRustPackage {
   pname = "treefetch";
-  version = "2022-06-07";
+  version = "unstable-2022-06-08";
 
   src = fetchFromGitHub {
     owner = "angelofallars";
@@ -14,7 +14,7 @@ rustPlatform.buildRustPackage {
     sha256 = "sha256-FDiulTit492KwV46A3qwjHQwzpjVJvIXTfTrMufXd5k=";
   };
 
-  cargoSha256 = "sha256-6Ne41Mo4Ixx5YpcgypvvA71p9clTqmNTN84kzhWfwJQ=";
+  cargoSha256 = "sha256-8HJYYPBogkgEfK3kv8dFUFaqUhvgYAOrhUIyZo3bqp8=";
 
   meta = with lib; {
     description = "A plant-based system fetch tool made with Rust.";
