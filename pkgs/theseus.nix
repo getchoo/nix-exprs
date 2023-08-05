@@ -37,8 +37,8 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "6a76811bed3c8a5cb5e280a8637ca9ffd4e069fc";
-    sha256 = "sha256-PjcrZMX48bKiJv1Iqfd+OSOISSXgg5TbDSc4m2b7IcA=";
+    rev = "47e28d24c81a00477afd91da8e1cdf3a79720385";
+    sha256 = "sha256-nC3tPizddjRtGFqEovWvomDakIt/1tdQOPtnM0+8nn8=";
   };
 
   cargoLock = {
