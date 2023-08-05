@@ -32,13 +32,13 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "theseus";
-  version = "unstable-2023-07-29";
+  version = "unstable-2023-08-05";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "87449f91c3d76dc784238fe8a30e6594c696e850";
-    sha256 = "sha256-bPVOD8yQU/AmxZmOKawtPEPU7r7lBjS24cCDdL3yXnA=";
+    rev = "6a76811bed3c8a5cb5e280a8637ca9ffd4e069fc";
+    sha256 = "sha256-PjcrZMX48bKiJv1Iqfd+OSOISSXgg5TbDSc4m2b7IcA=";
   };
 
   cargoLock = {
@@ -75,7 +75,7 @@ rustPlatform.buildRustPackage rec {
 
     dontFixup = true;
     outputHashMode = "recursive";
-    outputHash = "sha256-058bnPV0p75IoW62F2jS9ofn49InSYqpDjU/gnGDjl8=";
+    outputHash = "sha256-jFA8FTl1pi4pyuOzyg9kzzDTGjqtWiuI8hR6HkhrslU=";
   };
 
   buildInputs = [
