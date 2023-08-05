@@ -4,12 +4,12 @@
 }:
 vimUtils.buildVimPluginFrom2Nix {
   pname = "vim-just";
-  version = "unstable-2023-07-30";
+  version = "unstable-2023-08-02";
 
   src = fetchFromGitHub {
     owner = "NoahTheDuke";
     repo = "vim-just";
-    rev = "9129b096a6b43e0a47e405cc7b3fb55bc0e31c42";
-    sha256 = "sha256-GR+xY2MF5lT+mxeHccjijFAuSfuhSR4Gfwmtals3UBM=";
+    rev = "927b41825b9cd07a40fc15b4c68635c4b36fa923";
+    sha256 = "sha256-BmxYWUVBzTowH68eWNrQKV1fNN9d1hRuCnXqbEagRoY=";
   };
 }
