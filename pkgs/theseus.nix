@@ -2,13 +2,16 @@
   lib,
   stdenv,
   stdenvNoCC,
+  fetchFromGitHub,
   rustPlatform,
   buildGoModule,
   pnpm,
   esbuild,
+  CoreServices,
+  Security,
+  WebKit,
   dbus,
   freetype,
-  fetchFromGitHub,
   flite,
   glfw,
   glib-networking,
@@ -78,16 +81,19 @@ rustPlatform.buildRustPackage rec {
     outputHash = "sha256-jFA8FTl1pi4pyuOzyg9kzzDTGjqtWiuI8hR6HkhrslU=";
   };
 
-  buildInputs = [
-    dbus
-    freetype
-    gtk3
-    libappindicator-gtk3
-    librsvg
-    libsoup
-    openssl
-    webkitgtk
-  ];
+  buildInputs =
+    [openssl]
+    ++ lib.optionals stdenv.isLinux [
+      dbus
+      freetype
+      gtk3
+      libappindicator-gtk3
+      librsvg
+      libsoup
+      openssl
+      webkitgtk
+    ]
+    ++ lib.optionals stdenv.isDarwin [CoreServices Security WebKit];
 
   nativeBuildInputs = [
     pkg-config
@@ -121,7 +127,6 @@ rustPlatform.buildRustPackage rec {
     pnpm config set store-dir "$STORE_PATH"
     pnpm install --offline --frozen-lockfile --no-optional --ignore-script
     pnpm build
-		ls
 
     popd
   '';
@@ -142,11 +147,11 @@ rustPlatform.buildRustPackage rec {
         libXxf86vm
         libXrandr
       ]));
-    binPath = lib.makeBinPath ([xorg.xrandr] ++ jdks);
+    binPath = lib.makeBinPath (lib.optionals stdenv.isLinux [xorg.xrandr] ++ jdks);
   in ''
     gappsWrapperArgs+=(
-      --set LD_LIBRARY_PATH /run/opengl-driver/lib:${libPath}
-     	--prefix GIO_MODULE_DIR : ${glib-networking}/lib/gio/modules/
+      ${lib.optionalString stdenv.isLinux "--set LD_LIBRARY_PATH /run/opengl-driver/lib:${libPath}"}
+      ${lib.optionalString stdenv.isLinux "--prefix GIO_MODULE_DIR : ${glib-networking}/lib/gio/modules/"}
       --prefix PATH : ${binPath}
     )
   '';

@@ -7,7 +7,10 @@ in {
   fastfetch = callPackage ./fastfetch.nix {};
   huion = callPackage ./huion.nix {};
   mommy = callPackage ./mommy.nix {};
-  theseus = callPackage ./theseus.nix {inherit (pkgs.nodePackages) pnpm;};
+  theseus = callPackage ./theseus.nix {
+    inherit (pkgs.nodePackages) pnpm;
+    inherit (pkgs.darwin.apple_sdk.frameworks) CoreServices Security WebKit;
+  };
   treefetch = callPackage ./treefetch.nix {};
   swhkd = callPackage ./swhkd {};
   vim-just = callPackage ./vim-just.nix {};
