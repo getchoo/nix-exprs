@@ -26,13 +26,13 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "modrinth-app";
-  version = "unstable-2023-08-05";
+  version = "unstable-2023-08-06";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "47e28d24c81a00477afd91da8e1cdf3a79720385";
-    sha256 = "sha256-nC3tPizddjRtGFqEovWvomDakIt/1tdQOPtnM0+8nn8=";
+    rev = "5f0d44a8810ec01bd4c6ccc6407d2217cb9b18ed";
+    sha256 = "sha256-oKeggNxweRfznSXzJUjyRDZaKwGB8PT8pwo8BQSbCF0=";
   };
 
   cargoLock = {
@@ -69,7 +69,7 @@ rustPlatform.buildRustPackage rec {
 
     dontFixup = true;
     outputHashMode = "recursive";
-    outputHash = "sha256-jFA8FTl1pi4pyuOzyg9kzzDTGjqtWiuI8hR6HkhrslU=";
+    outputHash = "sha256-tDG0Gtz7jK+jeXxGLy1n689jf2Pm2g359PiB0Oi3hBI=";
   };
 
   buildInputs =
