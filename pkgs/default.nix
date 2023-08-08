@@ -8,11 +8,11 @@ in {
   huion = callPackage ./huion.nix {};
   mommy = callPackage ./mommy.nix {};
   nixgc = callPackage ./nixgc.nix {};
-  theseus-unwrapped = callPackage ./theseus {
+  modrinth-app-unwrapped = callPackage ./modrinth-app {
     inherit (pkgs.nodePackages) pnpm;
     inherit (pkgs.darwin.apple_sdk.frameworks) CoreServices Security WebKit;
   };
-  theseus = callPackage ./theseus/wrapper.nix {};
+  modrinth-app = callPackage ./modrinth-app/wrapper.nix {};
   treefetch = callPackage ./treefetch.nix {};
   swhkd = callPackage ./swhkd {};
   vim-just = callPackage ./vim-just.nix {};

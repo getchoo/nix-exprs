@@ -25,7 +25,7 @@
   wrapGAppsHook,
 }:
 rustPlatform.buildRustPackage rec {
-  pname = "theseus";
+  pname = "modrinth-app";
   version = "unstable-2023-08-05";
 
   src = fetchFromGitHub {
@@ -129,7 +129,7 @@ rustPlatform.buildRustPackage rec {
     genericName = meta.description;
   };
 
-  postInstall = ''
+  postInstall = lib.optionalString stdenv.isLinux ''
     mkdir -p $out/share/icons/hicolor/256x256/apps
     mkdir -p $out/share/applications
     cp theseus_gui/src-tauri/icons/Square284x284Logo.png $out/share/icons/hicolor/256x256/apps/com.modrinth.theseus.png
