@@ -5,33 +5,24 @@
   fetchFromGitHub,
   rustPlatform,
   buildGoModule,
-  pnpm,
-  esbuild,
+  makeDesktopItem,
   CoreServices,
   Security,
   WebKit,
+  pnpm,
+  esbuild,
   dbus,
   freetype,
-  flite,
-  glfw,
-  glib-networking,
   gtk3,
-  jdk8,
-  jdk17,
-  jdks ? [jdk8 jdk17],
   jq,
   libappindicator-gtk3,
-  libGL,
-  libpulseaudio,
   librsvg,
   libsoup,
   moreutils,
-  openal,
   openssl,
   pkg-config,
   webkitgtk,
   wrapGAppsHook,
-  xorg,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "theseus";
@@ -90,7 +81,6 @@ rustPlatform.buildRustPackage rec {
       libappindicator-gtk3
       librsvg
       libsoup
-      openssl
       webkitgtk
     ]
     ++ lib.optionals stdenv.isDarwin [CoreServices Security WebKit];
@@ -131,29 +121,19 @@ rustPlatform.buildRustPackage rec {
     popd
   '';
 
-  preFixup = let
-    libPath = lib.makeLibraryPath ([
-        flite
-        glfw
-        libGL
-        libpulseaudio
-        openal
-        stdenv.cc.cc.lib
-      ]
-      ++ (with xorg; [
-        libX11
-        libXcursor
-        libXext
-        libXxf86vm
-        libXrandr
-      ]));
-    binPath = lib.makeBinPath (lib.optionals stdenv.isLinux [xorg.xrandr] ++ jdks);
-  in ''
-    gappsWrapperArgs+=(
-      ${lib.optionalString stdenv.isLinux "--set LD_LIBRARY_PATH /run/opengl-driver/lib:${libPath}"}
-      ${lib.optionalString stdenv.isLinux "--prefix GIO_MODULE_DIR : ${glib-networking}/lib/gio/modules/"}
-      --prefix PATH : ${binPath}
-    )
+  desktopItem = makeDesktopItem {
+    name = "com.modrinth.theseus";
+    exec = "theseus_gui";
+    icon = "com.modrinth.theseus";
+    desktopName = "Modrinth App";
+    genericName = meta.description;
+  };
+
+  postInstall = ''
+    mkdir -p $out/share/icons/hicolor/256x256/apps
+    mkdir -p $out/share/applications
+    cp theseus_gui/src-tauri/icons/Square284x284Logo.png $out/share/icons/hicolor/256x256/apps/com.modrinth.theseus.png
+    cp ${desktopItem}/share/applications/*.desktop $out/share/applications
   '';
 
   meta = with lib; {
