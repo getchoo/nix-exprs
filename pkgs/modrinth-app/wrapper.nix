@@ -2,7 +2,7 @@
   lib,
   stdenv,
   symlinkJoin,
-  theseus-unwrapped,
+  modrinth-app-unwrapped,
   wrapGAppsHook,
   dbus,
   flite,
@@ -23,12 +23,12 @@
   xorg,
   ...
 }: let
-  theseusFinal = theseus-unwrapped;
+  final = modrinth-app-unwrapped;
 in
   symlinkJoin {
-    name = "theseus-${theseusFinal.version}";
+    name = "modrinth-app-${final.version}";
 
-    paths = [theseusFinal];
+    paths = [final];
 
     nativeBuildInputs = [
       wrapGAppsHook
@@ -69,5 +69,5 @@ in
       )
     '';
 
-    inherit (theseusFinal) meta;
+    inherit (final) meta;
   }
