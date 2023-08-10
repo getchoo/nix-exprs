@@ -4,24 +4,16 @@
   symlinkJoin,
   modrinth-app-unwrapped,
   wrapGAppsHook,
-  dbus,
   flite,
-  freetype,
   glib-networking,
   glfw,
-  gtk3,
   jdk8,
   jdk17,
   jdks ? [jdk8 jdk17],
-  libappindicator-gtk3,
   libGL,
   libpulseaudio,
-  librsvg,
-  libsoup,
   openal,
-  webkitgtk,
   xorg,
-  ...
 }: let
   final = modrinth-app-unwrapped;
 in
@@ -32,16 +24,6 @@ in
 
     nativeBuildInputs = [
       wrapGAppsHook
-    ];
-
-    buildInputs = lib.optionals stdenv.isLinux [
-      dbus
-      freetype
-      gtk3
-      libappindicator-gtk3
-      librsvg
-      libsoup
-      webkitgtk
     ];
 
     preFixup = let
