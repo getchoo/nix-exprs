@@ -6,6 +6,7 @@
   rustPlatform,
   buildGoModule,
   makeDesktopItem,
+  copyDesktopItems,
   CoreServices,
   Security,
   WebKit,
@@ -88,6 +89,7 @@ rustPlatform.buildRustPackage rec {
   nativeBuildInputs = [
     pkg-config
     pnpm
+    copyDesktopItems
     wrapGAppsHook
   ];
 
@@ -121,19 +123,26 @@ rustPlatform.buildRustPackage rec {
     popd
   '';
 
-  desktopItem = makeDesktopItem {
-    name = "com.modrinth.theseus";
-    exec = "theseus_gui";
-    icon = "com.modrinth.theseus";
-    desktopName = "Modrinth App";
-    genericName = meta.description;
-  };
+  desktopItems = [
+    (makeDesktopItem rec {
+      name = "com.modrinth.ModrinthApp";
+      exec = "theseus_gui";
+      icon = "com.modrinth.ModrinthApp";
+      desktopName = "Modrinth App";
+      genericName = desktopName;
+      comment = meta.description;
+      terminal = false;
+      startupNotify = true;
+      startupWMClass = "ModrinthApp";
+      categories = ["Game" "ActionGame" "AdventureGame" "Simulation"];
+      keywords = ["game" "minecraft" "mc"];
+    })
+  ];
 
   postInstall = lib.optionalString stdenv.isLinux ''
-    mkdir -p $out/share/icons/hicolor/256x256/apps
-    mkdir -p $out/share/applications
-    cp theseus_gui/src-tauri/icons/Square284x284Logo.png $out/share/icons/hicolor/256x256/apps/com.modrinth.theseus.png
-    cp ${desktopItem}/share/applications/*.desktop $out/share/applications
+    mkdir -p $out/share/{applications,icons/hicolor/256x256/apps}
+    copyDesktopItems
+    cp theseus_gui/src-tauri/icons/Square284x284Logo.png $out/share/icons/hicolor/256x256/apps/com.modrinth.ModrinthApp.png
   '';
 
   meta = with lib; {
@@ -143,7 +152,7 @@ rustPlatform.buildRustPackage rec {
     '';
     homepage = "https://modrinth.com";
     license = licenses.gpl3Plus;
-    maintainers = [maintainers.getchoo];
+    maintainers = with maintainers; [maintainers.getchoo];
     platforms = with platforms; linux ++ darwin;
   };
 }
