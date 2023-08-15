@@ -6,6 +6,7 @@ in {
   check-pr = callPackage ./check-pr.nix {};
   fastfetch = callPackage ./fastfetch.nix {};
   huion = callPackage ./huion.nix {};
+  klassy = pkgs.libsForQt5.callPackage ./klassy.nix {};
   mommy = callPackage ./mommy.nix {};
   nixgc = callPackage ./nixgc.nix {};
   modrinth-app-unwrapped = callPackage ./modrinth-app {
