@@ -49,6 +49,7 @@
     flakeModules = {
       default = import ./modules/flake;
       homeConfigurations = import ./modules/flake/homeConfigurations.nix;
+      homeManagerModules = import ./modules/flake/homeManagerModules.nix;
       hydraJobs = import ./modules/flake/hydraJobs.nix;
     };
 
