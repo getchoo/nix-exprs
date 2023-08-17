@@ -12,7 +12,12 @@ in {
         type = types.lazyAttrsOf types.raw;
         default = {};
         description = ''
-          An attribute set containing home-manager homeConfigurations
+          A collection of jobsets for Hydra. See https://nixos.wiki/wiki/Hydra#Flake_jobset
+        '';
+        example = ''
+          {
+          	inherit (self) packages;
+          }
         '';
       };
     };
