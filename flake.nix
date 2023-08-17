@@ -69,8 +69,6 @@
         p // {default = p.treefetch;}
     );
 
-    lib = import ./lib lib;
-
     overlays.default = final: _: import ./pkgs final;
 
     templates = let
