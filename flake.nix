@@ -44,7 +44,7 @@
         ./pkgs
         ./modules
         ./templates
-        ./ci.nix
+        ./hci.nix
       ];
 
       systems = [
