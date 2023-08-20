@@ -9,11 +9,17 @@
     };
   };
 
-  outputs = {nixpkgs, ...} @ inputs: {
+  outputs = {
+    nixpkgs,
+    self,
+    ...
+  } @ inputs: {
     nixosConfigurations."myHostname" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      modules = [./configuration.nix];
+      modules = [./configuration.nix self.nixosModules.default];
       specialArgs = inputs;
     };
+
+    nixosModules.default = import ./modules;
   };
 }
