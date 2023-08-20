@@ -1,21 +1,29 @@
-pkgs: let
-  inherit (pkgs) callPackage;
-in {
-  # original packages
-  cfspeedtest = callPackage ./cfspeedtest.nix {};
-  check-pr = callPackage ./check-pr.nix {};
-  fastfetch = callPackage ./fastfetch.nix {};
-  huion = callPackage ./huion.nix {};
-  klassy = pkgs.libsForQt5.callPackage ./klassy.nix {};
-  mommy = callPackage ./mommy.nix {};
-  nixgc = callPackage ./nixgc.nix {};
-  modrinth-app-unwrapped = callPackage ./modrinth-app {
-    inherit (pkgs.nodePackages) pnpm;
-    inherit (pkgs.darwin.apple_sdk.frameworks) CoreServices Security WebKit;
+{
+  self,
+  inputs,
+  ...
+}: {
+  perSystem = {
+    lib,
+    pkgs,
+    system,
+    ...
+  }: {
+    _module.args.pkgs = import inputs.nixpkgs {
+      inherit system;
+      overlays = [self.overlays.default];
+    };
+
+    packages = let
+      p = let
+        packages = import ./all-packages.nix pkgs;
+      in
+        lib.filterAttrs (_: v:
+          builtins.elem system (v.meta.platforms or []) && !(v.meta.broken or false))
+        packages;
+    in
+      p // {default = p.treefetch;};
   };
-  modrinth-app = callPackage ./modrinth-app/wrapper.nix {};
-  treefetch = callPackage ./treefetch.nix {};
-  swhkd = callPackage ./swhkd {};
-  vim-just = callPackage ./vim-just.nix {};
-  xwaylandvideobridge = callPackage ./xwaylandvideobridge.nix {};
+
+  flake.overlays.default = final: _: import ./all-packages.nix final;
 }
