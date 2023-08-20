@@ -17,20 +17,20 @@
       owner = "plasma";
       repo = prev.pname;
       rev = "Plasma/5.27";
-      sha256 = "sha256-3PMmfb074an9vx7VdpOWpD5gVNAUp7XipZz1Xgz0To8=";
+      sha256 = "sha256-u+CGk/jm5pHTPJYwKHwHc01c9E+ElsfKkzYg5NfIaJ8=";
     };
   });
 in
   stdenv.mkDerivation rec {
     pname = "xwaylandvideobridge";
-    version = "unstable-2023-08-03";
+    version = "unstable-2023-08-20";
 
     src = fetchFromGitLab {
       domain = "invent.kde.org";
       owner = "system";
       repo = pname;
-      rev = "5103ac1d47ba527369395ad99db2e2eeace3ac5f";
-      sha256 = "sha256-nvhpxNxOye5iIBnW5H4bYs/FZFweWpOPLByoA5esFEQ=";
+      rev = "4555293e49129dcb5f8c3354c86b29d561ca4034";
+      sha256 = "sha256-YtFcf43DQy7ImFYYQ45ELPRdFYVrBkpL/Bam8SUEVfE=";
     };
 
     nativeBuildInputs = [
