@@ -1,4 +1,7 @@
-{writeShellApplication}:
+{
+  lib,
+  writeShellApplication,
+}:
 writeShellApplication {
   name = "check-pr";
   text = ''
@@ -11,3 +14,4 @@ writeShellApplication {
     nix run "github:$1?ref=pull/$2/head''${3:+#$3}"
   '';
 }
+// {meta.platforms = lib.platforms.all;}
