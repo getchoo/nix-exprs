@@ -1,35 +1,49 @@
 # nix-exprs
 
 [![built with garnix](https://img.shields.io/badge/Built_with-Garnix-blue?style=flat-square&logo=nixos&link=https%3A%2F%2Fgarnix.io)](https://garnix.io)
+[![hercules-ci build status](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fgetchoo%2Fnix-exprs%2Fcommits%2Fmain%2Fstatus&query=state&style=flat-square&logo=github&label=hercules-ci%20build%20status&color=8F97CB)](https://hercules-ci.com/)
 
 ## how to use
 
 ### enable binary cache
 
-all packages are built with [garnix](https://garnix.io/), and cached on their servers. you can use this
-yourself by following the instructions [here](https://garnix.io/docs/caching). i would also recommend
-[donating](https://opencollective.com/garnix_io) if you can!
+linux packages are built with [hercules-ci](https://hercules-ci.com/), while packages for apple silicon 
+are built with [garnix](https://garnix.io/). both have binary caches, however different ones; you can use
+garnix's by following the instructions [here](https://garnix.io/docs/caching), and the cachix cache for
+hercules-ci by following the instructions [here](https://app.cachix.org/cache/getchoo#pull). i would also recommend
+[donating](https://opencollective.com/garnix_io) to garnix if you can!
 
 example:
+
+<details>
+<summary>nixos configuration</summary>
 
 ```nix
 {
   nix.settings = {
     trusted-substituters = [
       "https://cache.garnix.io"
+      "https://getchoo.cachix.org"
     ];
 
     trusted-public-keys = [
       "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+      "getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE="
     ];
   }
 }
 ```
 
-### library
+</details>
 
-> **Note**
-> coming soon
+<details>
+<summary>using `cachix` on linux</summary>
+
+```bash
+nix run nixpkgs#cachix -- use getchoo
+```
+
+</details>
 
 ### flake configuration
 
