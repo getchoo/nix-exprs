@@ -10,7 +10,7 @@
     nixpkgs,
     ...
   }: let
-    version = builtins.substring 0 8 self.lastModifiedDate;
+    version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
 
     systems = [
       "x86_64-linux"
@@ -19,33 +19,26 @@
       "aarch64-darwin"
     ];
 
-    forAllSystems = nixpkgs.lib.genAttrs systems;
-    nixpkgsFor = forAllSystems (system:
+    genSystems = nixpkgs.lib.genAttrs systems;
+    nixpkgsFor = genSystems (system:
       import nixpkgs {
         inherit system;
         overlays = [self.overlays.default];
       });
 
-    forEachSystem = fn:
-      forAllSystems (system:
-        fn {
-          inherit system;
-          pkgs = nixpkgsFor.${system};
-        });
+    forAllSystems = fn: genSystems (sys: fn nixpkgsFor.${sys});
   in {
-    devShells = forEachSystem ({pkgs, ...}: let
-      inherit (pkgs) mkShell;
-    in {
-      default = mkShell {
+    devShells = forAllSystems (pkgs: {
+      default = pkgs.mkShell {
         packages = with pkgs; [
           bash
         ];
       };
     });
 
-    formatter = forEachSystem ({pkgs, ...}: pkgs.alejandra);
+    formatter = forAllSystems (p: p.alejandra);
 
-    packages = forEachSystem ({pkgs, ...}: {
+    packages = forAllSystems (pkgs: {
       inherit (pkgs) hello;
       default = pkgs.hello;
     });
