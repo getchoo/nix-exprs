@@ -1,22 +1,13 @@
-{
-  self,
-  inputs,
-  ...
-}: {
+_: {
   perSystem = {
     lib,
     pkgs,
     system,
     ...
   }: {
-    _module.args.pkgs = import inputs.nixpkgs {
-      inherit system;
-      overlays = [self.overlays.default];
-    };
-
     packages = let
       p = let
-        packages = import ./all-packages.nix pkgs;
+        packages = import ./all-packages.nix {prev = pkgs;};
       in
         lib.filterAttrs (_: v:
           builtins.elem system (v.meta.platforms or []) && !(v.meta.broken or false))
@@ -25,5 +16,5 @@
       p // {default = p.treefetch;};
   };
 
-  flake.overlays.default = final: _: import ./all-packages.nix final;
+  flake.overlays.default = final: prev: import ./all-packages.nix {inherit final prev;};
 }

@@ -10,6 +10,7 @@
     nixpkgs,
     ...
   }: let
+    inherit (nixpkgs) lib;
     version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
 
     systems = [
@@ -19,14 +20,13 @@
       "aarch64-darwin"
     ];
 
-    genSystems = nixpkgs.lib.genAttrs systems;
-    nixpkgsFor = genSystems (system:
-      import nixpkgs {
-        inherit system;
-        overlays = [self.overlays.default];
-      });
-
+    genSystems = lib.genAttrs systems;
+    nixpkgsFor = genSystems (sys: nixpkgs.legacyPackages.${sys});
     forAllSystems = fn: genSystems (sys: fn nixpkgsFor.${sys});
+
+    packageFn = pkgs: {
+      hello = pkgs.callPackage ./default.nix {inherit self version;};
+    };
   in {
     devShells = forAllSystems (pkgs: {
       default = pkgs.mkShell {
@@ -43,25 +43,6 @@
       default = pkgs.hello;
     });
 
-    overlays.default = _: prev: {
-      hello = prev.stdenv.mkDerivation {
-        pname = "hello";
-        inherit version;
-
-        src = self;
-
-        installPhase = ''
-          echo "hi" > $out
-        '';
-
-        meta = with prev.lib; {
-          description = "";
-          homepage = "";
-          license = licenses.mit;
-          maintainers = [maintainers.getchoo];
-          platforms = platforms.linux;
-        };
-      };
-    };
+    overlays.default = _: prev: (packageFn prev);
   };
 }
