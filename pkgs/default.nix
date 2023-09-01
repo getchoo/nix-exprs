@@ -6,15 +6,21 @@ _: {
     ...
   }: {
     packages = let
+      inherit (builtins) elem;
+      inherit (lib) filterAttrs makeScope;
+      inherit (pkgs) newScope;
+
       p = let
-        packages = import ./all-packages.nix {prev = pkgs;};
+        packages = makeScope newScope (final: import ./all-packages.nix final pkgs);
       in
-        lib.filterAttrs (_: v:
-          builtins.elem system (v.meta.platforms or []) && !(v.meta.broken or false))
+        filterAttrs (_: v:
+          elem system (v.meta.platforms or []) && !(v.meta.broken or false))
         packages;
     in
       p // {default = p.treefetch;};
   };
 
-  flake.overlays.default = final: prev: import ./all-packages.nix {inherit final prev;};
+  flake = {
+    overlays.default = final: prev: (import ./all-packages.nix final prev);
+  };
 }
