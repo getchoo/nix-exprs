@@ -22,11 +22,14 @@
     };
   };
 
-  herculesCI = {lib, ...}: let
-    ciSystems = ["x86_64-linux" "aarch64-linux"];
-    findCompatible = lib.filterAttrs (s: _: builtins.elem s ciSystems);
+  herculesCI = {
+    config,
+    lib,
+    ...
+  }: let
+    findCompatible = lib.filterAttrs (s: _: builtins.elem s config.ciSystems);
   in {
-    inherit ciSystems;
+    ciSystems = ["x86_64-linux" "aarch64-linux"];
 
     onPush.default.outputs = lib.mkForce {
       packages = findCompatible self.packages;
