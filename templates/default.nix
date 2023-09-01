@@ -1,9 +1,9 @@
-{self, ...}: {
+{
   flake = {
     templates = let
       # string -> string -> {}
       mkTemplate = name: description: {
-        path = "${self}/templates/${name}";
+        path = ./${name};
         inherit description;
       };
     in {

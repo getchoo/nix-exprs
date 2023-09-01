@@ -5,7 +5,7 @@
   ...
 }: let
   inherit (builtins) attrNames map;
-  inherit (lib) mkDefault mkEnableOption mkIf mkOption types;
+  inherit (lib) filterAttrs mapAttrs mkDefault mkEnableOption mkIf mkOption types;
   cfg = config.getchoo.basicConfig;
 
   mapInputs = fn: map fn (attrNames inputs);
@@ -28,15 +28,20 @@ in {
     nix = {
       gc = {
         automatic = mkDefault true;
-        options = mkDefault "-d --delete-older-then 2d";
+        options = mkDefault "-d --delete-older-than 2d";
       };
+
+      nixPath = mapInputs (i: "${i}=${cfg.channelPath.dirname i}");
+
+      registry =
+        {n.flake = inputs.nixpkgs;}
+        // (mapAttrs (_: flake: {inherit flake;})
+          (filterAttrs (n: _: n != "nixpkgs") inputs));
 
       settings = {
         auto-optimise-store = true;
         experimental-features = ["nix-command" "flakes" "auto-allocate-uids" "repl-flake"];
       };
-
-      nixPath = mapInputs (i: "${i}=${cfg.channelPath.dirname i}");
     };
 
     systemd.tmpfiles.rules = mapInputs (i: "L+ ${cfg.channelPath i}     - - - - ${inputs.${i}.outPath}");
