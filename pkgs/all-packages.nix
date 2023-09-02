@@ -5,6 +5,8 @@ in {
 
   check-pr = callPackage ./check-pr.nix {};
 
+  clippy-sarif = callPackage ./clippy-sarif.nix {};
+
   fastfetch = callPackage ./fastfetch.nix {};
 
   huion = callPackage ./huion.nix {};
