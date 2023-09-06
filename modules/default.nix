@@ -1,4 +1,4 @@
-_: {
+{
   flake = {
     flakeModules = {
       default = import ./flake;

@@ -1,4 +1,4 @@
-_: {
+{self, ...}: {
   perSystem = {
     lib,
     pkgs,
@@ -7,15 +7,16 @@ _: {
   }: {
     packages = let
       inherit (builtins) elem;
-      inherit (lib) filterAttrs makeScope;
-      inherit (pkgs) newScope;
+      inherit (lib) filterAttrs fix;
 
-      p = let
-        packages = makeScope newScope (final: import ./all-packages.nix final pkgs);
-      in
-        filterAttrs (_: v:
-          elem system (v.meta.platforms or []) && !(v.meta.broken or false))
-        packages;
+      unfiltered = fix (
+        final:
+          self.overlays.default (final // {inherit (pkgs) nodePackages darwin;}) pkgs
+      );
+
+      p = filterAttrs (_: v:
+        elem system (v.meta.platforms or []) && !(v.meta.broken or false))
+      unfiltered;
     in
       p // {default = p.treefetch;};
   };

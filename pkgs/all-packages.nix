@@ -17,12 +17,14 @@ in {
 
   nixgc = callPackage ./nixgc.nix {};
 
-  modrinth-app-unwrapped = final.callPackage ./modrinth-app {
-    inherit (prev.nodePackages) pnpm;
-    inherit (prev.darwin.apple_sdk.frameworks) CoreServices Security WebKit;
+  modrinth-app-unwrapped = callPackage ./modrinth-app {
+    inherit (final.nodePackages) pnpm;
+    inherit (final.darwin.apple_sdk.frameworks) CoreServices Security WebKit;
   };
 
-  modrinth-app = final.callPackage ./modrinth-app/wrapper.nix {};
+  modrinth-app = callPackage ./modrinth-app/wrapper.nix {
+    inherit (final) modrinth-app-unwrapped;
+  };
 
   treefetch = callPackage ./treefetch.nix {};
 
