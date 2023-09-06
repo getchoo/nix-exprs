@@ -1,5 +1,7 @@
 builds:
   exclude: []
   include:
+    - "packages.x86_64-linux.*"
+    - "packages.aarch64-linux.*"
     - "packages.aarch64-darwin.modrinth-app"
     - "packages.aarch64-darwin.modrinth-app-unwrapped"

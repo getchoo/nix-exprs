@@ -1,57 +1,51 @@
 # nix-exprs
 
 [![built with garnix](https://img.shields.io/badge/Built_with-Garnix-blue?style=flat-square&logo=nixos&link=https%3A%2F%2Fgarnix.io)](https://garnix.io)
-[![hercules-ci build status](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fgetchoo%2Fnix-exprs%2Fcommits%2Fmain%2Fstatus&query=state&style=flat-square&logo=github&label=hercules-ci%20build%20status&color=8F97CB)](https://hercules-ci.com/)
 
 ## how to use
 
-### enable binary cache
+### enabling the binary cache
 
-linux packages are built with [hercules-ci](https://hercules-ci.com/), while packages for apple silicon 
-are built with [garnix](https://garnix.io/). both have binary caches, however different ones; you can use
-garnix's by following the instructions [here](https://garnix.io/docs/caching), and the cachix cache for
-hercules-ci by following the instructions [here](https://app.cachix.org/cache/getchoo#pull). i would also recommend
-[donating](https://opencollective.com/garnix_io) to garnix if you can!
-
-example:
+all packages are built with [garnix](https://garnix.io/), and cached on their servers. you can use this
+yourself by following the instructions [here](https://garnix.io/docs/caching). i would also recommend
+[donating](https://opencollective.com/garnix_io) if you can!
 
 <details>
-<summary>nixos configuration</summary>
+<summary>example</summary>
 
 ```nix
 {
   nix.settings = {
-    trusted-substituters = [
-      "https://cache.garnix.io"
-      "https://getchoo.cachix.org"
-    ];
+    trusted-substituters = ["https://cache.garnix.io"];
 
-    trusted-public-keys = [
-      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
-      "getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE="
-    ];
-  }
+    trusted-public-keys = ["cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="];
+  };
 }
 ```
 
 </details>
 
+### installing packages (flake)
+
+you can add this repository as an input, and optionally override the nixpkgs input to build against
+your own revision. from there, you can use packages as an overlay or install them directly
+
 <details>
-<summary>using `cachix` on linux</summary>
-
-```bash
-nix run nixpkgs#cachix -- use getchoo
-```
-
-</details>
-
-### flake configuration
+<summary>with the overlay</summary>
 
 ```nix
 {
   inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     getchoo = {
       url = "github:getchoo/nix-exprs";
+      # this will break reproducibility, but lower the instances of nixpkgs
+      # in flake.lock
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -59,46 +53,113 @@ nix run nixpkgs#cachix -- use getchoo
     nixpkgs,
     getchoo,
     ...
-  }: {
+  }: let
+    getchooModule = {
+      nixpkgs.overlays = [getchoo.overlays.default];
+      environment.systemPackages = [pkgs.treefetch];
+    };
+  in {
     nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
-      modules = [
-        {
-          nixpkgs.overlays = [getchoo.overlays.default];
-          environment.systemPackages = with pkgs; [
-            treefetch
-          ];
-        }
-      ];
+      modules = [getchooModule];
+    };
+
+    darwinConfigurations.hostname = darwin.lib.darwinSystem {
+      modules = [getchooModule];
     };
   };
 }
 ```
 
-### nix channels
+</details>
 
-#### adding the channel
-
-```bash
-nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo
-nix-channel --update
-```
-
-#### usage
+<details>
+<summary>directly</summary>
 
 ```nix
-{pkgs, ...}: let
-    getchoo = import <getchoo>;
-in {
-    nixpkgs.overlays = [getchoo.overlays.default];
-    environment.systemPackages = with pkgs; [
-        treefetch
-    ];
+{
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    getchoo = {
+      url = "github:getchoo/nix-exprs";
+      # this will break reproducibility, but lower the instances of nixpkgs
+      # in flake.lock
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = {
+    nixpkgs,
+    getchoo,
+    ...
+  }: let
+    getchooModule = ({pkgs, ...}: let
+      inherit (pkgs.stdenv.hostPlatform) system;
+    in {
+      environment.systemPackages = [getchoo.packages.${system}.treefetch];
+    });
+  in {
+    nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
+      modules = [getchooModule];
+    };
+
+    darwinConfigurations.hostname = darwin.lib.darwinSystem {
+      modules = [getchooModule];
+    };
+  };
 }
 ```
 
-### cli support
+</details>
 
-this overlay can also be used in the base nix package manager :)
+### installing packages (without flakes)
+
+this repository uses [flake-compat](https://github.com/edolstra/flake-compat) to allow for non-flake users to
+import a channel or the `default.nix` to access the flake's outputs.
+
+<details>
+<summary>with the overlay</summary>
+
+```nix
+{pkgs, ...}: let
+  # install with `nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo`
+  getchoo = import <getchoo>;
+
+  # or use `fetchTarball`
+  # getchoo = import (builtins.fetchTarball "https://github.com/getchoo/nix-exprs/archive/main.tar.gz");
+in {
+  nixpkgs.overlays = [getchoo.overlays.default];
+  environment.systemPackages = [pkgs.treefetch];
+}
+```
+
+</details>
+
+<details>
+<summary>directly</summary>
+
+```nix
+{pkgs, ...}: let
+  inherit (pkgs.stdenv.hostPlatform) system;
+
+  # install with `nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo`
+  getchoo = import <getchoo>;
+
+  # or use `fetchTarball`
+  # getchoo = import (builtins.fetchTarball "https://github.com/getchoo/nix-exprs/archive/main.tar.gz");
+in {
+  environment.systemPackages = [getchoo.packages.${system}.treefetch];
+}
+```
+
+</details>
+
+### ad-hoc installation
+
+this flake can also be used in the base nix package manager :)
 
 > **Note**
 > for nixos/nix-darwin users, `nixpkgs.overlays` does not configure
@@ -108,29 +169,40 @@ this overlay can also be used in the base nix package manager :)
 the best way to make this overlay available for you is to
 add it to your flake registry or `~/.config/nixpkgs/overlays.nix`.
 
-#### flake registry
+<details>
+<summary>flake registry</summary>
 
 this is the preferred way to use this overlay in the cli, as it allows
 for full reproducibility with the flake.
 
-to use this overlay with commands like `nix build/run/shell`, you can
+to use this overlay with commands like `nix build/run/shell/profile`, you can
 add it to your flake registry:
 
 ```shell
 nix registry add getchoo github:getchoo/nix-exprs
-nix run getchoo#treefetch
+nix profile install getchoo#treefetch
 ```
 
-#### overlays.nix
+</details>
+
+<details>
+<summary>overlays.nix</summary>
 
 for those who don't want to use this flake's revision of nixpkgs,
 or do not use flakes, you can also add it as an overlay.
 
-[add the channel](#adding-the-channel) to your nix profile, then place
-this in `~/.config/nixpkgs/overlays.nix` (or a nix file in `~/.config/nixpkgs/overlays/`):
+first, add the channel for this repository with
+
+```sh
+nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo
+```
+
+then in `~/.config/nixpkgs/overlays.nix`:
 
 ```nix
 let
   getchoo = import <getchoo>;
 in [getchoo.overlays.default]
 ```
+
+</details>
