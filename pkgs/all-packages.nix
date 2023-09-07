@@ -7,8 +7,6 @@ in {
 
   clippy-sarif = callPackage ./clippy-sarif.nix {};
 
-  fastfetch = callPackage ./fastfetch.nix {};
-
   huion = callPackage ./huion.nix {};
 
   klassy = prev.libsForQt5.callPackage ./klassy.nix {};
