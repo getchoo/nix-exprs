@@ -1,6 +1,6 @@
 # nix-exprs
 
-[![built with garnix](https://img.shields.io/badge/Built_with-Garnix-blue?style=flat-square&logo=nixos&link=https%3A%2F%2Fgarnix.io)](https://garnix.io)
+[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fgetchoo%2Fnix-exprs)](https://garnix.io)
 
 ## how to use
 
