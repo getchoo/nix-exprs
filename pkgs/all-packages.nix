@@ -16,8 +16,8 @@ in {
   nixgc = callPackage ./nixgc.nix {};
 
   modrinth-app-unwrapped = callPackage ./modrinth-app {
-    inherit (final.nodePackages) pnpm;
-    inherit (final.darwin.apple_sdk.frameworks) CoreServices Security WebKit;
+    inherit (final.nodePackages or prev.nodePackages) pnpm;
+    inherit ((final.darwin or prev.darwin).apple_sdk.frameworks) CoreServices Security WebKit;
   };
 
   modrinth-app = callPackage ./modrinth-app/wrapper.nix {

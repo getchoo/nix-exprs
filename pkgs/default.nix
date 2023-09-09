@@ -9,10 +9,7 @@
       inherit (builtins) elem;
       inherit (lib) filterAttrs fix;
 
-      unfiltered = fix (
-        final:
-          self.overlays.default (final // {inherit (pkgs) nodePackages darwin;}) pkgs
-      );
+      unfiltered = fix (final: self.overlays.default final pkgs);
 
       p = filterAttrs (_: v:
         elem system (v.meta.platforms or []) && !(v.meta.broken or false))
