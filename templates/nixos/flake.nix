@@ -17,7 +17,7 @@
     nixosConfigurations."myHostname" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [./configuration.nix self.nixosModules.default];
-      specialArgs = inputs;
+      specialArgs = {inherit inputs;} // inputs;
     };
 
     nixosModules.default = import ./modules;
