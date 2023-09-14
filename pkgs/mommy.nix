@@ -11,13 +11,13 @@
 in
   stdenvNoCC.mkDerivation rec {
     pname = "mommy";
-    version = "1.2.3";
+    version = "1.2.4";
 
     src = fetchFromGitHub {
       owner = "FWDekker";
       repo = pname;
       rev = "v${version}";
-      sha256 = "sha256-LT21MJg2rF84o2rWKguEP4UUOOu27nNGls95sBYgICw=";
+      sha256 = "sha256-SqWhbhQeRUO0cD9Fv/nwKjTI3F0Sg2VhFZtrbyA9Wb4=";
     };
 
     checkInputs = [man-db shellspec];
