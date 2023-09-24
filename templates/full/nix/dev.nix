@@ -1,9 +1,10 @@
-{self, ...}: {
+{
   perSystem = {
-    config,
     pkgs,
+    config,
+    self',
     ...
-  } @ args: {
+  }: {
     pre-commit = {
       settings.hooks = {
         alejandra.enable = true;
@@ -16,13 +17,16 @@
     devShells = {
       default = pkgs.mkShell {
         shellHook = config.pre-commit.installationScript;
+
         packages = with pkgs; [
-          self.formatter.${args.system}
+          self'.formatter
           deadnix
           nil
           statix
         ];
       };
     };
+
+    formatter = pkgs.alejandra;
   };
 }

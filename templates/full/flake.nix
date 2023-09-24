@@ -16,9 +16,11 @@
 
     pre-commit = {
       url = "github:cachix/pre-commit-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-stable.follows = "nixpkgs";
-      inputs.flake-compat.follows = "compat";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nixpkgs-stable.follows = "nixpkgs";
+        flake-compat.follows = "compat";
+      };
     };
   };
 
@@ -30,7 +32,16 @@
     parts.lib.mkFlake {inherit inputs;} {
       imports = [
         pre-commit.flakeModule
-        ./nix
+
+        ./nix/dev.nix
+        ./nix/packages.nix
+      ];
+
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
       ];
     };
 }
