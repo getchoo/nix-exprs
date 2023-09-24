@@ -11,7 +11,6 @@
     ...
   }: let
     inherit (nixpkgs) lib;
-    version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
 
     systems = [
       "x86_64-linux"
@@ -20,13 +19,7 @@
       "aarch64-darwin"
     ];
 
-    genSystems = lib.genAttrs systems;
-    nixpkgsFor = genSystems (sys: nixpkgs.legacyPackages.${sys});
-    forAllSystems = fn: genSystems (sys: fn nixpkgsFor.${sys});
-
-    packageFn = pkgs: {
-      hello = pkgs.callPackage ./default.nix {inherit self version;};
-    };
+    forAllSystems = fn: lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
   in {
     devShells = forAllSystems (pkgs: {
       default = pkgs.mkShell {
@@ -36,13 +29,17 @@
       };
     });
 
-    formatter = forAllSystems (p: p.alejandra);
+    formatter = forAllSystems (pkgs: pkgs.alejandra);
 
-    packages = forAllSystems (pkgs: {
-      inherit (pkgs) hello;
-      default = pkgs.hello;
+    packages = forAllSystems (pkgs: let
+      pkgs' = lib.fix (final: self.overlays.default final pkgs);
+    in {
+      inherit (pkgs') hello;
+      default = pkgs'.hello;
     });
 
-    overlays.default = _: prev: (packageFn prev);
+    overlays.default = _: prev: {
+      foo = prev.callPackage ./. {inherit self;};
+    };
   };
 }
