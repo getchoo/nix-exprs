@@ -23,17 +23,16 @@
   openssl,
   pkg-config,
   webkitgtk,
-  wrapGAppsHook,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "modrinth-app";
-  version = "unstable-2023-09-12";
+  version = "unstable-2023-10-02";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "1e8852b54007f8739d94c4593aa369ac512b30fc";
-    sha256 = "sha256-lL5zWeQHHo0o3H2iMYoR4b38f8/vZah6xzQOa3nh0/8=";
+    rev = "f73c112e078a4776be90b1ee82050b51683b5041";
+    sha256 = "sha256-ArQe66siXDhs18Wvvdv+jxQTN+g5IWUX+G3lLcHvbaQ=";
   };
 
   cargoLock = {
@@ -70,7 +69,7 @@ rustPlatform.buildRustPackage rec {
 
     dontFixup = true;
     outputHashMode = "recursive";
-    outputHash = "sha256-8Qk2eqMws5kJ0Yn9JSwaiw1KFNpUaJ1wR9B+DE/fnFw=";
+    outputHash = "sha256-gRQfWrAY/2XxiVSHtQd4YKruJWjkpAB5OsXZMmV0iDs=";
   };
 
   buildInputs =
@@ -90,7 +89,6 @@ rustPlatform.buildRustPackage rec {
     pkg-config
     pnpm
     copyDesktopItems
-    wrapGAppsHook
   ];
 
   ESBUILD_BINARY_PATH = "${lib.getExe (esbuild.override {
@@ -146,6 +144,7 @@ rustPlatform.buildRustPackage rec {
   '';
 
   meta = with lib; {
+    mainProgram = "theseus_gui";
     description = "Modrinth's future game launcher";
     longDescription = ''
       Modrinth's future game launcher which can be used as a CLI, GUI, and a library for creating and playing Modrinth projects.

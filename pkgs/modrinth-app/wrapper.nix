@@ -4,52 +4,64 @@
   symlinkJoin,
   modrinth-app-unwrapped,
   wrapGAppsHook,
+  addOpenGLRunpath,
   flite,
   glib-networking,
-  glfw,
   jdk8,
   jdk17,
   jdks ? [jdk8 jdk17],
   libGL,
   libpulseaudio,
-  openal,
+  udev,
   xorg,
-}: let
-  final = modrinth-app-unwrapped;
-in
-  symlinkJoin {
-    name = "modrinth-app-${final.version}";
+}:
+symlinkJoin {
+  name = "modrinth-app-${modrinth-app-unwrapped.version}";
 
-    paths = [final];
+  paths = [modrinth-app-unwrapped];
 
-    nativeBuildInputs = [
-      wrapGAppsHook
+  buildInputs = [
+    glib-networking
+  ];
+
+  nativeBuildInputs = [
+    wrapGAppsHook
+  ];
+
+  postBuild = let
+    libPath = lib.makeLibraryPath [
+      flite # narrator support
+      libGL
+      libpulseaudio
+      stdenv.cc.cc.lib
+
+      udev # oshi
+
+      # lwjgl
+      xorg.libX11
+      xorg.libXcursor
+      xorg.libXext
+      xorg.libXxf86vm
+      xorg.libXrandr
     ];
 
-    preFixup = let
-      libPath = lib.makeLibraryPath ([
-          flite
-          glfw
-          libGL
-          libpulseaudio
-          openal
-          stdenv.cc.cc.lib
-        ]
-        ++ (with xorg; [
-          libX11
-          libXcursor
-          libXext
-          libXxf86vm
-          libXrandr
-        ]));
-      binPath = lib.makeBinPath (lib.optionals stdenv.isLinux [xorg.xrandr] ++ jdks);
-    in ''
-      gappsWrapperArgs+=(
-        ${lib.optionalString stdenv.isLinux "--set LD_LIBRARY_PATH /run/opengl-driver/lib:${libPath}"}
-        ${lib.optionalString stdenv.isLinux "--prefix GIO_MODULE_DIR : ${glib-networking}/lib/gio/modules/"}
-        --prefix PATH : ${binPath}
-      )
-    '';
+    binPath = lib.makeBinPath (
+      lib.optionals stdenv.isLinux [xorg.xrandr]
+    );
 
-    inherit (final) meta;
-  }
+    args =
+      ["--prefix PATH : ${lib.makeSearchPath "bin/java" jdks}"]
+      ++ lib.optionals stdenv.isLinux [
+        "--set LD_LIBRARY_PATH ${addOpenGLRunpath.driverLink}/lib:${libPath}"
+        "--prefix PATH : ${binPath}"
+      ];
+  in ''
+    gappsWrapperArgs+=(
+      ${lib.concatStringsSep "\n" args}
+    )
+
+    wrapGAppsHook
+  '';
+
+  inherit (modrinth-app-unwrapped) meta;
+}
