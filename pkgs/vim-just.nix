@@ -2,7 +2,7 @@
   fetchFromGitHub,
   vimUtils,
 }:
-vimUtils.buildVimPluginFrom2Nix {
+vimUtils.buildVimPlugin {
   pname = "vim-just";
   version = "unstable-2023-08-02";
 
