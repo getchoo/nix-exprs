@@ -1,24 +1,20 @@
-{self, ...}: {
-  perSystem = {
-    lib,
-    pkgs,
-    system,
-    ...
-  }: {
-    packages = let
-      inherit (builtins) elem;
-      inherit (lib) filterAttrs fix;
+final: prev:
+with prev; let
+  # directories are mapped to packages here for convenience sake
+  shouldUse = name: type: !(lib.hasPrefix "_" name) && type == "directory";
+  dir = lib.filterAttrs shouldUse (builtins.readDir ./.);
+  imported = lib.mapAttrs (name: _: callPackage ./${name} {}) dir;
+in
+  imported
+  // {
+    klassy = libsForQt5.callPackage ./klassy {};
 
-      unfiltered = fix (final: self.overlays.default final pkgs);
+    modrinth-app-unwrapped = callPackage ./modrinth-app {
+      inherit (final.nodePackages or prev.nodePackages) pnpm;
+      inherit ((final.darwin or prev.darwin).apple_sdk.frameworks) CoreServices Security WebKit;
+    };
 
-      p = filterAttrs (_: v:
-        elem system (v.meta.platforms or []) && !(v.meta.broken or false))
-      unfiltered;
-    in
-      p // {default = p.treefetch;};
-  };
-
-  flake = {
-    overlays.default = final: prev: (import ./all-packages.nix final prev);
-  };
-}
+    modrinth-app = callPackage ./modrinth-app/wrapper.nix {
+      inherit (final) modrinth-app-unwrapped;
+    };
+  }
