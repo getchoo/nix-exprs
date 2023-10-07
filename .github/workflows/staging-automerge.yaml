@@ -13,10 +13,9 @@ jobs:
       contents: write
       pull-requests: write
 
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
-
     steps:
+      - uses: actions/checkout@v4
+
       - name: create pr
         run: |
           {
@@ -30,5 +29,11 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+
       - name: enable auto-merge
         run: gh pr merge --auto --rebase "$PR"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
