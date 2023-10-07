@@ -5,17 +5,19 @@ on:
     branches: ["staging"]
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   automerge:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      pull-requests: write
+
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+
     steps:
-      - name: create-pr
-        id: pr
+      - name: create pr
         run: |
           {
             echo 'PR<<EOF'
@@ -30,5 +32,3 @@ jobs:
 
       - name: enable auto-merge
         run: gh pr merge --auto --rebase "$PR"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
