@@ -43,6 +43,10 @@
 
     overlays.default = final: prev: (import ./pkgs final prev);
 
+    flakeModules = {
+      githubWorkflowGenerator = import ./modules/flake/githubWorkflow.nix;
+    };
+
     templates = let
       # string -> string -> {}
       mkTemplate = name: description: {
