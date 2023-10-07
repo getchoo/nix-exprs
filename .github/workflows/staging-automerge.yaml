@@ -15,25 +15,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: create pr
         run: |
-          {
-            echo 'PR<<EOF'
             gh pr create \
-              --repo ${{ github.repository }} \
               --base main \
               --head ${{ github.ref_name }} \
               --title "auto-merge: ${{ github.ref_name }} -> main" \
               --fill
-            echo EOF
-          } >> "$GITHUB_ENV"
-
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
 
       - name: enable auto-merge
-        run: gh pr merge --auto --rebase "$PR"
+        run: gh pr merge --auto --rebase --match-head-commit ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
