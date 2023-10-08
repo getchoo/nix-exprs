@@ -14,11 +14,35 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: check if pr exists
+        id: check
+        run: |
+          {
+            echo 'skip<<EOF'
+            prs=$(gh pr list \
+              --repo ${{ github.repository }} \
+              --head staging \
+              --json state \
+              --jq 'map(select(.state == "OPEN")) | length')
+
+            if (( prs > 0 )); then
+              echo true
+            else
+              echo false
+            fi
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - uses: actions/checkout@v4
+        if: "!steps.check.outputs.skip"
         with:
           fetch-depth: 0
 
       - name: create pr
+        if: "!steps.check.outputs.skip"
         run: |
             gh pr create \
               --base main \
@@ -28,8 +52,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-
       - name: enable auto-merge
+        if: "!steps.check.outputs.skip"
         run: gh pr merge --auto --rebase --match-head-commit ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
