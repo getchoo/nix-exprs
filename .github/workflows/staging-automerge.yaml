@@ -38,11 +38,11 @@ jobs:
       - name: create pr
         if: ${{ !steps.check.outputs.skip }}
         run: |
-            gh pr create \
-              --base main \
-              --head ${{ github.ref_name }} \
-              --title "auto-merge: ${{ github.ref_name }} -> main" \
-              --fill
+          gh pr create \
+            --base main \
+            --head ${{ github.ref_name }} \
+            --title "auto-merge: ${{ github.ref_name }} -> main" \
+            --fill
         env:
           GH_TOKEN: ${{ github.token }}
 
