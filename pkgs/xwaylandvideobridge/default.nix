@@ -11,14 +11,14 @@
 }:
 stdenv.mkDerivation rec {
   pname = "xwaylandvideobridge";
-  version = "unstable-2023-10-06";
+  version = "unstable-2023-10-17";
 
   src = fetchFromGitLab {
     domain = "invent.kde.org";
     owner = "system";
     repo = pname;
-    rev = "4941030dffac94b9c04398490911482ed2b564f3";
-    sha256 = "sha256-JRdzy71r3mJQybmbCooXfsJRyvLBAsOKsAtcjVvKEag=";
+    rev = "0aaf35f614656cf28496bb9d7b63f8d40c597bc8";
+    sha256 = "sha256-yg1ywtasKYOdulHug8XDKnN9/exHqrHDJDrbriLgNNI=";
   };
 
   nativeBuildInputs = [
