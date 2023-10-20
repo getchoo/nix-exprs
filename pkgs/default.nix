@@ -35,4 +35,8 @@ in
     modrinth-app = callPackage ./modrinth-app/wrapper.nix {
       inherit (final) modrinth-app-unwrapped;
     };
+
+    vinegar = callPackage ./vinegar {
+      wine = (final.wineWowPackages or prev.wineWowPackages).unstable;
+    };
   }
