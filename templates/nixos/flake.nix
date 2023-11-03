@@ -9,11 +9,31 @@
     };
   };
 
-  outputs = {nixpkgs, ...} @ inputs: {
+  outputs = {nixpkgs, ...} @ inputs: let
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+
+    forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
+  in {
     nixosConfigurations."myHostname" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [./configuration.nix];
       specialArgs = {inherit inputs;};
     };
+
+    devShells = forAllSystems (pkgs: {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          just
+          fzf
+        ];
+      };
+    });
+
+    formatter = forAllSystems (pkgs: pkgs.alejandra);
   };
 }
