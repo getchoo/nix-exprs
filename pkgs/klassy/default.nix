@@ -11,7 +11,7 @@
   wrapQtAppsHook,
 }:
 stdenv.mkDerivation rec {
-  name = "klassy";
+  pname = "klassy";
   version = "4.3.breeze5.27.5";
 
   src = fetchFromGitHub {
