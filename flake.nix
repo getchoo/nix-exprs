@@ -44,7 +44,8 @@
     overlays.default = final: prev: (import ./pkgs final prev);
 
     flakeModules = {
-      githubWorkflowGenerator = import ./modules/flake/githubWorkflow.nix;
+      githubWorkflowGenerator = import ./modules/flake/githubWorkflow.nix self.flakeModules.workflowLib;
+      workflowLib = import ./modules/flake/workflowLib.nix lib;
     };
 
     templates = let
