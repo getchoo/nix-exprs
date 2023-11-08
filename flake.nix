@@ -43,14 +43,9 @@
 
     overlays.default = final: prev: (import ./pkgs final prev);
 
-    flakeModules = {
-      githubWorkflowGenerator = import ./modules/flake/githubWorkflow.nix self.flakeModules.workflowLib;
-      workflowLib = import ./modules/flake/workflowLib.nix lib;
-    };
-
     templates = let
       # string -> string -> {}
-      mkTemplate = name: description: {
+      toTemplate = name: description: {
         path = builtins.path {
           path = ./templates/${name};
           name = "${name}-template";
@@ -59,7 +54,7 @@
         inherit description;
       };
     in
-      lib.mapAttrs mkTemplate {
+      lib.mapAttrs toTemplate {
         basic = "minimal boilerplate for my flakes";
         full = "big template for complex flakes (using flake-parts)";
         nixos = "minimal boilerplate for flake-based nixos configuration";
