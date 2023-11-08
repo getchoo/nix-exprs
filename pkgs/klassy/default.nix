@@ -10,14 +10,14 @@
   kirigami2,
   wrapQtAppsHook,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "klassy";
   version = "4.3.breeze5.27.5";
 
   src = fetchFromGitHub {
     owner = "paulmcauley";
     repo = "klassy";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-2qs30L7U5kf1Yf+4Pgsjsyaqf9iIaeuRK25Xtn47AYI=";
   };
 
@@ -45,4 +45,4 @@ stdenv.mkDerivation rec {
     platforms = platforms.linux;
     maintainers = with maintainers; [getchoo];
   };
-}
+})
