@@ -16,7 +16,10 @@ writeShellApplication {
       nix profile wipe-history --profile "$profile" "$@"
     done
   '';
-}
-// {
-  meta.platforms = lib.platforms.linux;
+
+  meta = with lib; {
+    description = "nix-collect-garbage, but with nix profile";
+    maintainers = [maintainers.getchoo];
+    platforms = platforms.linux;
+  };
 }
