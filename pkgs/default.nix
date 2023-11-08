@@ -1,9 +1,21 @@
 final: prev:
 with prev; let
   # directories are mapped to packages here for convenience sake
-  shouldUse = name: type: !(lib.hasPrefix "_" name) && type == "directory";
-  dir = lib.filterAttrs shouldUse (builtins.readDir ./.);
-  imported = lib.mapAttrs (name: _: callPackage ./${name} {}) dir;
+  imported = lib.pipe ./. [
+    builtins.readDir
+
+    (
+      lib.filterAttrs (
+        name: type: !(lib.hasPrefix "_" name) && type == "directory"
+      )
+    )
+
+    (
+      lib.mapAttrs (
+        file: _: callPackage ./${file} {}
+      )
+    )
+  ];
 in
   imported
   // {
