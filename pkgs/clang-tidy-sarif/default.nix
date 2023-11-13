@@ -4,7 +4,6 @@
   rustPlatform,
   clang-tidy-sarif,
   testers,
-  nix-update-script,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "clang-tidy-sarif";
@@ -24,10 +23,6 @@ rustPlatform.buildRustPackage rec {
   passthru = {
     tests.version = testers.testVersion {
       package = clang-tidy-sarif;
-    };
-
-    updateScript = nix-update-script {
-      extraArgs = ["--regex" "'${pname}-(.*)'"];
     };
   };
 

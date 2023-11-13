@@ -25,10 +25,6 @@ rustPlatform.buildRustPackage rec {
     tests.version = testers.testVersion {
       package = shellcheck-sarif;
     };
-
-    updateScript = nix-update-script {
-      extraArgs = ["--regex" "'${pname}-(.*)'"];
-    };
   };
 
   meta = with lib; {
