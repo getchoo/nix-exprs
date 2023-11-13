@@ -22,6 +22,7 @@ in
     clang-tidy-sarif = callPackage ./clang-tidy-sarif {inherit (final) clang-tidy-sarif;};
     clippy-sarif = callPackage ./clippy-sarif {inherit (final) clippy-sarif;};
     hadolint-sarif = callPackage ./hadolint-sarif {inherit (final) hadolint-sarif;};
+    sarif-fmt = callPackage ./sarif-fmt {inherit (final) sarif-fmt;};
 
     klassy = libsForQt5.callPackage ./klassy {};
 
