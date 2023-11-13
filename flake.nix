@@ -24,13 +24,36 @@
 
     forAllSystems = fn: lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
   in {
+    checks = forAllSystems (pkgs: {
+      ciGate = let
+        inherit (pkgs) system;
+        pkgs' = self.packages.${system};
+        requirements = {
+          # all packages on linux are built
+          "x86_64-linux" = lib.mapAttrsToList (_: v: v.pname or v.name) pkgs';
+          "aarch64-linux" = requirements."x86_64-linux";
+
+          # but not for macos
+          "aarch64-darwin" = ["modrinth-app"];
+
+          # garnix also doesn't support intel macs :(
+          "x86_64-darwin" = [];
+        };
+      in
+        pkgs.runCommand "ci-gate" {
+          nativeBuildInputs =
+            builtins.filter (v: builtins.elem (v.pname or v.name) requirements.${system})
+            (builtins.attrValues pkgs');
+        } "touch $out";
+    });
+
     packages = forAllSystems (
       pkgs: let
         overlay = lib.fix (final: self.overlays.default final pkgs);
 
         /*
         this filters out packages that may be broken or not supported
-        on the current system. packages that have no `version` or `platforms`
+        on the current system. packages that have no `broken` or `platforms`
         meta attribute are assumed to be valid
         */
         isValid = _: v:
