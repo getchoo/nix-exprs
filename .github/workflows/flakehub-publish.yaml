@@ -13,8 +13,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/flakehub-push@main
+
+      - name: install nix
+        uses: nixbuild/nix-quick-install-action@v26
+
+      - name: push to flakehub
+        uses: DeterminateSystems/flakehub-push@v3
         with:
           visibility: "public"
           rolling: true
