@@ -26,10 +26,6 @@ rustPlatform.buildRustPackage rec {
     tests.version = testers.testVersion {
       package = clippy-sarif;
     };
-
-    updateScript = nix-update-script {
-      extraArgs = ["--regex" "'${pname}-(.*)'"];
-    };
   };
 
   meta = with lib; {
