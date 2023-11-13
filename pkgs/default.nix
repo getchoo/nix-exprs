@@ -19,6 +19,7 @@ with prev; let
 in
   imported
   // {
+    clang-tidy-sarif = callPackage ./clang-tidy-sarif {inherit (final) clang-tidy-sarif;};
     clippy-sarif = callPackage ./clippy-sarif {inherit (final) clippy-sarif;};
 
     klassy = libsForQt5.callPackage ./klassy {};
