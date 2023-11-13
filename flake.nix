@@ -41,6 +41,8 @@
         pkgs' // {default = pkgs'.treefetch;}
     );
 
+    formatter = forAllSystems (pkgs: pkgs.alejandra);
+
     overlays.default = final: prev: (import ./pkgs final prev);
 
     templates = let
