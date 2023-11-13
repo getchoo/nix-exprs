@@ -19,6 +19,8 @@ with prev; let
 in
   imported
   // {
+    clippy-sarif = callPackage ./clippy-sarif {inherit (final) clippy-sarif;};
+
     klassy = libsForQt5.callPackage ./klassy {};
 
     modrinth-app-unwrapped = callPackage ./modrinth-app {
