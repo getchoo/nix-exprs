@@ -10,6 +10,7 @@
   CoreServices,
   Security,
   WebKit,
+  cacert,
   pnpm,
   esbuild,
   dbus,
@@ -26,13 +27,13 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "modrinth-app";
-  version = "unstable-2023-10-31";
+  version = "unstable-2023-11-21";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "f5c7f90d19d62fdc955fa78521ec5740d8b7cc63";
-    sha256 = "sha256-PVMIfS/VQCmefAKDs+wpj6/J4XVcMghVgSKDFC4s98M=";
+    rev = "c1518c52f3c99fdc04dd456f8886e73e699f7293";
+    sha256 = "sha256-CaYIkJom3XlfdJquS7mUU1FLVXTry+XSMkmpaudBN2M=";
   };
 
   cargoLock = {
@@ -47,6 +48,7 @@ rustPlatform.buildRustPackage rec {
     inherit src version;
 
     nativeBuildInputs = [
+      cacert
       jq
       moreutils
       pnpm
