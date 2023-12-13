@@ -27,13 +27,13 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "modrinth-app";
-  version = "unstable-2023-11-21";
+  version = "unstable-2023-12-13";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "c1518c52f3c99fdc04dd456f8886e73e699f7293";
-    sha256 = "sha256-CaYIkJom3XlfdJquS7mUU1FLVXTry+XSMkmpaudBN2M=";
+    rev = "e39635c75b9ec6abdb07e118dd77e7bb87feac7b";
+    sha256 = "sha256-Xr0KG2MtIg4t4TxkMsZO3Nb5/81KzdTUgnSJBbDAa7A=";
   };
 
   cargoLock = {
@@ -93,7 +93,7 @@ rustPlatform.buildRustPackage rec {
     copyDesktopItems
   ];
 
-  ESBUILD_BINARY_PATH = "${lib.getExe (esbuild.override {
+  ESBUILD_BINARY_PATH = lib.getExe (esbuild.override {
     buildGoModule = args:
       buildGoModule (args
         // rec {
@@ -106,7 +106,7 @@ rustPlatform.buildRustPackage rec {
           };
           vendorHash = "sha256-+BfxCyg0KkDQpHt/wycy/8CTG6YBA/VJvJFhhzUnSiQ=";
         });
-  })}";
+  });
 
   preBuild = ''
     export HOME=$(mktemp -d)
@@ -154,6 +154,6 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://modrinth.com";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [maintainers.getchoo];
-    platforms = with platforms; linux ++ darwin;
+    platforms = ["x86_64-linux" "x86_64-darwin"];
   };
 }

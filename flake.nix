@@ -34,7 +34,7 @@
           "aarch64-linux" = requirements."x86_64-linux";
 
           # but not for macos
-          "aarch64-darwin" = ["modrinth-app"];
+          "aarch64-darwin" = [];
 
           # garnix also doesn't support intel macs :(
           "x86_64-darwin" = [];
