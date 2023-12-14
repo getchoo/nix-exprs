@@ -4,7 +4,6 @@
   rustPlatform,
   hadolint-sarif,
   testers,
-  nix-update-script,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "hadolint-sarif";

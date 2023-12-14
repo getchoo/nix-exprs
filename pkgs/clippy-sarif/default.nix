@@ -5,7 +5,6 @@
   clippy,
   clippy-sarif,
   testers,
-  nix-update-script,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "clippy-sarif";
