@@ -1,11 +1,11 @@
 {
   lib,
+  stdenv,
   fetchFromGitHub,
   rustPlatform,
   clippy,
   sarif-fmt,
   testers,
-  nix-update-script,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "sarif-fmt";
@@ -22,27 +22,27 @@ rustPlatform.buildRustPackage rec {
   cargoBuildFlags = ["--package" pname];
   cargoTestFlags = cargoBuildFlags;
 
-  nativeCheckInputs = [
+  nativeCheckInputs = lib.optionals stdenv.isLinux [
     # test_clippy
     clippy
   ];
 
-  checkFlags = [
-    # this test uses nix so...no go
-    "--skip=test_clang_tidy"
-    # ditto
-    "--skip=test_hadolint"
-    # ditto
-    "--skip=test_shellcheck"
-  ];
+  checkFlags =
+    [
+      # this test uses nix so...no go
+      "--skip=test_clang_tidy"
+      # ditto
+      "--skip=test_hadolint"
+      # ditto
+      "--skip=test_shellcheck"
+    ]
+    ++ lib.optionals stdenv.isDarwin [
+      "--skip=test_clippy"
+    ];
 
   passthru = {
     tests.version = testers.testVersion {
       package = sarif-fmt;
-    };
-
-    updateScript = nix-update-script {
-      extraArgs = ["--regex" "'${pname}-(.*)'"];
     };
   };
 
