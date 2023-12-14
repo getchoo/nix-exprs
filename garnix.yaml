@@ -1,9 +1,0 @@
-builds:
-  exclude:
-    - "*.x86_64-darwin.*"
-  include:
-    - "checks.*.*"
-    - "packages.x86_64-linux.*"
-    - "packages.aarch64-linux.*"
-    - "packages.aarch64-darwin.modrinth-app"
-    - "packages.aarch64-darwin.modrinth-app-unwrapped"
