@@ -2,8 +2,8 @@
   description = "getchoo's nix expressions";
 
   nixConfig = {
-    extra-substituters = ["https://cache.garnix.io"];
-    extra-trusted-public-keys = ["cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="];
+    extra-substituters = ["https://cache.mydadleft.me/nix-exprs"];
+    extra-trusted-public-keys = ["nix-exprs:mLifiLXlGVkkuFpIbqcrCWkIxKn2GyCkrxOuE7fwLxQ="];
   };
 
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
@@ -24,29 +24,6 @@
 
     forAllSystems = fn: lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
   in {
-    checks = forAllSystems (pkgs: {
-      ciGate = let
-        inherit (pkgs) system;
-        pkgs' = self.packages.${system};
-        requirements = {
-          # all packages on linux are built
-          "x86_64-linux" = lib.mapAttrsToList (_: v: v.pname or v.name) pkgs';
-          "aarch64-linux" = requirements."x86_64-linux";
-
-          # but not for macos
-          "aarch64-darwin" = [];
-
-          # garnix also doesn't support intel macs :(
-          "x86_64-darwin" = [];
-        };
-      in
-        pkgs.runCommand "ci-gate" {
-          nativeBuildInputs =
-            builtins.filter (v: builtins.elem (v.pname or v.name) requirements.${system})
-            (builtins.attrValues pkgs');
-        } "touch $out";
-    });
-
     packages = forAllSystems (
       pkgs: let
         overlay = lib.fix (final: self.overlays.default final pkgs);
@@ -84,5 +61,42 @@
         full = "big template for complex flakes (using flake-parts)";
         nixos = "minimal boilerplate for flake-based nixos configuration";
       };
+
+    githubWorkflow.matrix = let
+      ciSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+      ];
+
+      platforms = {
+        "x86_64-linux" = {
+          arch = "x64";
+          os = "ubuntu-latest";
+        };
+
+        "aarch64-linux" = {
+          arch = "aarch64";
+          os = "ubuntu-latest";
+        };
+
+        "x86_64-darwin" = {
+          arch = "x64";
+          os = "macos-latest";
+        };
+      };
+    in {
+      include = lib.pipe ciSystems [
+        (systems: lib.getAttrs systems self.packages)
+
+        (lib.mapAttrsToList (system:
+          lib.mapAttrsToList (attr: _: {
+            inherit (platforms.${system}) os arch;
+            attr = "packages.${system}.${attr}";
+          })))
+
+        lib.flatten
+      ];
+    };
   };
 }

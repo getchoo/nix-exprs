@@ -1,14 +1,15 @@
 # nix-exprs
 
-[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fgetchoo%2Fnix-exprs)](https://garnix.io)
+[![Build status](https://img.shields.io/github/actions/workflow/status/getchoo/nix-exprs/ci.yaml?style=flat-square&logo=github&label=Build%20status&color=5277c3)](https://github.com/getchoo/nix-exprs/actions/workflows/ci.yaml)
 
 ## how to use
 
 ### enabling the binary cache
 
-all packages are built with [garnix](https://garnix.io/), and cached on their servers. you can use this
-yourself by following the instructions [here](https://garnix.io/docs/caching). i would also recommend
-[donating](https://opencollective.com/garnix_io) if you can!
+all packages are cached in my own [attic](https://github.com/zhaofengli/attic) instance. you can use this
+yourself by following the instructions [here](https://docs.attic.rs/user-guide/index.html), with the endpoint
+being `https://cache.mydadleft.me` and no token required. the binary cache endpoint `https://cache.mydadleft.me/nix-exprs`
+may also be used in the `nixConfig` attribute of flakes or a system configuration.
 
 <details>
 <summary>example</summary>
@@ -16,9 +17,8 @@ yourself by following the instructions [here](https://garnix.io/docs/caching). i
 ```nix
 {pkgs, ...}: {
   nix.settings = {
-    trusted-substituters = ["https://cache.garnix.io"];
-
-    trusted-public-keys = ["cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="];
+    trusted-substituters = ["https://cache.mydadleft.me/nix-exprs"];
+    trusted-public-keys = ["nix-exprs:mLifiLXlGVkkuFpIbqcrCWkIxKn2GyCkrxOuE7fwLxQ="];
   };
 }
 ```

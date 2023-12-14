@@ -1,4 +1,4 @@
-name: flakehub publish
+name: Flakehub publish
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     permissions:
       id-token: write
       contents: read
@@ -14,10 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: install nix
-        uses: nixbuild/nix-quick-install-action@v26
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v9
 
-      - name: push to flakehub
+      - name: Push to Flakehub
         uses: DeterminateSystems/flakehub-push@v3
         with:
           visibility: "public"
