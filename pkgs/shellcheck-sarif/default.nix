@@ -4,7 +4,6 @@
   rustPlatform,
   shellcheck-sarif,
   testers,
-  nix-update-script,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "shellcheck-sarif";
