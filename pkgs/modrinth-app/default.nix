@@ -7,6 +7,7 @@
   buildGoModule,
   makeDesktopItem,
   copyDesktopItems,
+  AppKit,
   CoreServices,
   Security,
   WebKit,
@@ -85,7 +86,12 @@ rustPlatform.buildRustPackage rec {
       libsoup
       webkitgtk
     ]
-    ++ lib.optionals stdenv.isDarwin [CoreServices Security WebKit];
+    ++ lib.optionals stdenv.isDarwin [
+      AppKit
+      CoreServices
+      Security
+      WebKit
+    ];
 
   nativeBuildInputs = [
     pkg-config
