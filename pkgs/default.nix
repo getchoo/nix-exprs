@@ -29,7 +29,14 @@ in
 
     modrinth-app-unwrapped = callPackage ./modrinth-app {
       inherit (final.nodePackages or prev.nodePackages) pnpm;
-      inherit ((final.darwin or prev.darwin).apple_sdk.frameworks) CoreServices Security WebKit;
+
+      inherit
+        ((final.darwin or prev.darwin).apple_sdk.frameworks)
+        AppKit
+        CoreServices
+        Security
+        WebKit
+        ;
     };
 
     modrinth-app = callPackage ./modrinth-app/wrapper.nix {
