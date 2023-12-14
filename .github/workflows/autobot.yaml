@@ -4,6 +4,7 @@ on: pull_request
 
 jobs:
   automerge:
+    name: Auto-merge
     runs-on: ubuntu-latest
 
     permissions:
