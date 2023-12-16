@@ -7,10 +7,9 @@
 
 ### enabling the binary cache
 
-all packages are cached in my own [attic](https://github.com/zhaofengli/attic) instance. you can use this
-yourself by following the instructions [here](https://docs.attic.rs/user-guide/index.html), with the endpoint
-being `https://cache.mydadleft.me` and no token required. the binary cache endpoint `https://cache.mydadleft.me/nix-exprs`
-may also be used in the `nixConfig` attribute of flakes or a system configuration.
+all packages are cached by [cachix](https://cachix.org). to enable it, you can run
+`nix run nixpkgs#cachix use getchoo`. it may may also be used in the `nixConfig` attribute
+of flakes or in a system configuration.
 
 <details>
 <summary>example</summary>
@@ -18,8 +17,8 @@ may also be used in the `nixConfig` attribute of flakes or a system configuratio
 ```nix
 {pkgs, ...}: {
   nix.settings = {
-    trusted-substituters = ["https://cache.mydadleft.me/nix-exprs"];
-    trusted-public-keys = ["nix-exprs:mLifiLXlGVkkuFpIbqcrCWkIxKn2GyCkrxOuE7fwLxQ="];
+    trusted-substituters = ["https://getchoo.cachix.org"];
+    trusted-public-keys = ["getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE="];
   };
 }
 ```
@@ -118,16 +117,13 @@ a "plug-n-play" solution to using the packages, and/or a reduction in duplicated
 }
 ```
 
+</details>
+
 #### ad-hoc installation
 
 this flake can also be used in the base nix package manager!
 
-> **Note**
-> for nixos/nix-darwin users, `nixpkgs.overlays` does not configure
-> overlays for tools such as `nix(-)run`, `nix(-)shell`, etc. so this
-> will also be required for you
-
-the best way to make this overlay available for you is to
+the best way to make these packages available for you is to
 add it to your flake registry like so.
 
 ```sh
@@ -135,8 +131,6 @@ nix registry add getchoo github:getchoo/nix-exprs
 nix profile install getchoo#treefetch
 nix shell getchoo#cfspeedtest
 ```
-
-</details>
 
 ### standard nix
 
