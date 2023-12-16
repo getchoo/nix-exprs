@@ -55,16 +55,11 @@ jobs:
         with:
           extra-conf: "extra-platforms = aarch64-linux arm-linux"
 
-      - name: Setup local Nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@v2
-
-      - name: Setup Attic cache
-        uses: ryanccn/attic-action@v0
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v12
         with:
-          endpoint: https://cache.mydadleft.me
-          cache: nix-exprs
-          token: ${{ secrets.ATTIC_TOKEN }}
-          skip-push: ${{ github.event_name == 'pull_request' }}
+          name: getchoo
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Run build
         run: |
@@ -85,16 +80,11 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v9
 
-      - name: Setup local Nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@v2
-
-      - name: Setup Attic cache
-        uses: ryanccn/attic-action@v0
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v12
         with:
-          endpoint: https://cache.mydadleft.me
-          cache: nix-exprs
-          token: ${{ secrets.ATTIC_TOKEN }}
-          skip-push: ${{ github.event_name == 'pull_request' }}
+          name: getchoo
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Run check
         run: nix flake check --show-trace --accept-flake-config
