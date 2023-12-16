@@ -2,8 +2,8 @@
   description = "getchoo's nix expressions";
 
   nixConfig = {
-    extra-substituters = ["https://cache.mydadleft.me/nix-exprs"];
-    extra-trusted-public-keys = ["nix-exprs:mLifiLXlGVkkuFpIbqcrCWkIxKn2GyCkrxOuE7fwLxQ="];
+    extra-substituters = ["https://getchoo.cachix.org"];
+    extra-trusted-public-keys = ["getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE="];
   };
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
