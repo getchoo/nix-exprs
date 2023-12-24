@@ -43,3 +43,6 @@ in
       inherit (final) modrinth-app-unwrapped;
     };
   }
+  // lib.optionalAttrs (stdenv.hostPlatform.system == "x86_64-linux") {
+    tcmalloc-tf2 = gperftools.override {inherit (pkgsi686Linux.llvmPackages_16) stdenv;};
+  }
