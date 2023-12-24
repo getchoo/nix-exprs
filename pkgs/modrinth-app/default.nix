@@ -27,7 +27,7 @@
   webkitgtk,
 }:
 rustPlatform.buildRustPackage rec {
-  pname = "modrinth-app";
+  pname = "modrinth-app-unwrapped";
   version = "unstable-2023-12-14";
 
   src = fetchFromGitHub {
