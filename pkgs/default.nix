@@ -16,33 +16,39 @@ with prev; let
       )
     )
   ];
+
+  recursiveMerge = builtins.foldl' (acc: attr: acc // attr) {};
 in
-  imported
-  // {
-    clang-tidy-sarif = callPackage ./clang-tidy-sarif.nix {inherit (final) clang-tidy-sarif;};
-    clippy-sarif = callPackage ./clippy-sarif.nix {inherit (final) clippy-sarif;};
-    hadolint-sarif = callPackage ./hadolint-sarif.nix {inherit (final) hadolint-sarif;};
-    sarif-fmt = callPackage ./sarif-fmt.nix {inherit (final) sarif-fmt;};
-    shellcheck-sarif = callPackage ./shellcheck-sarif.nix {inherit (final) shellcheck-sarif;};
+  recursiveMerge [
+    imported
 
-    klassy = libsForQt5.callPackage ./klassy.nix {};
+    {
+      clang-tidy-sarif = callPackage ./clang-tidy-sarif.nix {inherit (final) clang-tidy-sarif;};
+      clippy-sarif = callPackage ./clippy-sarif.nix {inherit (final) clippy-sarif;};
+      hadolint-sarif = callPackage ./hadolint-sarif.nix {inherit (final) hadolint-sarif;};
+      sarif-fmt = callPackage ./sarif-fmt.nix {inherit (final) sarif-fmt;};
+      shellcheck-sarif = callPackage ./shellcheck-sarif.nix {inherit (final) shellcheck-sarif;};
 
-    modrinth-app-unwrapped = callPackage ./modrinth-app {
-      inherit (final.nodePackages or prev.nodePackages) pnpm;
+      klassy = libsForQt5.callPackage ./klassy.nix {};
 
-      inherit
-        ((final.darwin or prev.darwin).apple_sdk.frameworks)
-        AppKit
-        CoreServices
-        Security
-        WebKit
-        ;
-    };
+      modrinth-app-unwrapped = callPackage ./modrinth-app {
+        inherit (final.nodePackages or prev.nodePackages) pnpm;
 
-    modrinth-app = callPackage ./modrinth-app/wrapper.nix {
-      inherit (final) modrinth-app-unwrapped;
-    };
-  }
-  // lib.optionalAttrs (stdenv.hostPlatform.system == "x86_64-linux") {
-    tcmalloc-tf2 = gperftools.override {inherit (pkgsi686Linux.llvmPackages_16) stdenv;};
-  }
+        inherit
+          ((final.darwin or prev.darwin).apple_sdk.frameworks)
+          AppKit
+          CoreServices
+          Security
+          WebKit
+          ;
+      };
+
+      modrinth-app = callPackage ./modrinth-app/wrapper.nix {
+        inherit (final) modrinth-app-unwrapped;
+      };
+    }
+
+    (lib.optionalAttrs (stdenv.hostPlatform.system == "x86_64-linux") {
+      tcmalloc-tf2 = gperftools.override {inherit (pkgsi686Linux.llvmPackages_16) stdenv;};
+    })
+  ]
