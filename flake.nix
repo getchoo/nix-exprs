@@ -13,8 +13,6 @@
     self,
     ...
   }: let
-    inherit (nixpkgs) lib;
-
     systems = [
       "x86_64-linux"
       "aarch64-linux"
@@ -22,10 +20,15 @@
       "aarch64-darwin"
     ];
 
-    forAllSystems = fn: lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
+    forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
   in {
     packages = forAllSystems (
-      pkgs: let
+      {
+        lib,
+        pkgs,
+        system,
+        ...
+      }: let
         overlay = lib.fix (final: self.overlays.default final pkgs);
 
         /*
@@ -56,13 +59,15 @@
         inherit description;
       };
     in
-      lib.mapAttrs toTemplate {
+      builtins.mapAttrs toTemplate {
         basic = "minimal boilerplate for my flakes";
         full = "big template for complex flakes (using flake-parts)";
         nixos = "minimal boilerplate for flake-based nixos configuration";
       };
 
     githubWorkflow.matrix = let
+      inherit (nixpkgs) lib;
+
       ciSystems = [
         "x86_64-linux"
         "aarch64-linux"
