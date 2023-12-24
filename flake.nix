@@ -22,6 +22,8 @@
 
     forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
   in {
+    checks = forAllSystems (import ./checks.nix self);
+
     packages = forAllSystems (
       {
         lib,
