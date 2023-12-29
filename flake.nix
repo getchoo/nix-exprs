@@ -66,44 +66,5 @@
         full = "big template for complex flakes (using flake-parts)";
         nixos = "minimal boilerplate for flake-based nixos configuration";
       };
-
-    githubWorkflow.matrix = let
-      inherit (nixpkgs) lib;
-
-      ciSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-      ];
-
-      platforms = {
-        "x86_64-linux" = {
-          arch = "x64";
-          os = "ubuntu-latest";
-        };
-
-        "aarch64-linux" = {
-          arch = "aarch64";
-          os = "ubuntu-latest";
-        };
-
-        "x86_64-darwin" = {
-          arch = "x64";
-          os = "macos-latest";
-        };
-      };
-    in {
-      include = lib.pipe ciSystems [
-        (systems: lib.getAttrs systems self.packages)
-
-        (lib.mapAttrsToList (system:
-          lib.mapAttrsToList (attr: _: {
-            inherit (platforms.${system}) os arch;
-            attr = "packages.${system}.${attr}";
-          })))
-
-        lib.flatten
-      ];
-    };
   };
 }
