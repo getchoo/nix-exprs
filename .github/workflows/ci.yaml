@@ -32,11 +32,11 @@ jobs:
           platforms: "arm64"
 
       - name: Install Nix
-        if: matrix.system != 'aarch64'
+        if: matrix.system != 'aarch64-linux'
         uses: DeterminateSystems/nix-installer-action@v9
 
       - name: Install Nix (with aarch64)
-        if: matrix.system == 'aarch64'
+        if: matrix.system == 'aarch64-linux'
         uses: DeterminateSystems/nix-installer-action@v9
         with:
           extra-conf: "extra-platforms = aarch64-linux arm-linux"
