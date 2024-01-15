@@ -42,7 +42,7 @@ jobs:
           extra-conf: "extra-platforms = aarch64-linux arm-linux"
 
       - name: Setup Cachix
-        uses: cachix/cachix-action@v13
+        uses: cachix/cachix-action@v14
         with:
           name: getchoo
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
