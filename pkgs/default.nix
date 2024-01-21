@@ -50,5 +50,6 @@ in
 
     (lib.optionalAttrs (stdenv.hostPlatform.system == "x86_64-linux") {
       tcmalloc-tf2 = gperftools.override {inherit (pkgsi686Linux.llvmPackages_16) stdenv;};
+      xash3d = pkgsi686Linux.callPackage ./xash3d.nix {};
     })
   ]
