@@ -1,6 +1,20 @@
-(import
-  (fetchTarball {
-    url = "https://github.com/edolstra/flake-compat/archive/35bb57c0c8d8b62bbfd284272c928ceb64ddbde9.tar.gz";
-    sha256 = "sha256-4gtG9iQuiKITOjNQQeQIpoIB6b16fm+504Ch3sNKLd8=";
-  }) {src = ./.;})
-.defaultNix
+let
+  lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+  nixpkgs' = fetchTarball {
+    url = lock.nodes.nixpkgs.locked.url or "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.nixpkgs.locked.rev}.tar.gz";
+    sha256 = lock.nodes.nixpkgs.locked.narHash;
+  };
+in
+  {
+    nixpkgs ?
+      import nixpkgs' {
+        config = {};
+        overlays = [];
+        inherit system;
+      },
+    system ? builtins.currentSystem,
+  }: let
+    # fixed point wizardry
+    pkgs' = import ./overlay.nix (nixpkgs // pkgs') nixpkgs;
+  in
+    pkgs'
