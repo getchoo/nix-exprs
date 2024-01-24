@@ -31,8 +31,6 @@
         system,
         ...
       }: let
-        overlay = lib.fix (final: self.overlays.default final pkgs);
-
         /*
         this filters out packages that may be broken or not supported
         on the current system. packages that have no `broken` or `platforms`
@@ -41,30 +39,18 @@
         isValid = _: v:
           lib.elem pkgs.system (v.meta.platforms or [pkgs.system]) && !(v.meta.broken or false);
 
-        pkgs' = lib.filterAttrs isValid overlay;
+        pkgs' = lib.filterAttrs isValid (import ./. {
+          nixpkgs = pkgs;
+          inherit system;
+        });
       in
         pkgs' // {default = pkgs'.treefetch;}
     );
 
     formatter = forAllSystems (pkgs: pkgs.alejandra);
 
-    overlays.default = final: prev: (import ./pkgs final prev);
+    overlays.default = final: prev: import ./overlay.nix final prev;
 
-    templates = let
-      # string -> string -> {}
-      toTemplate = name: description: {
-        path = builtins.path {
-          path = ./templates/${name};
-          name = "${name}-template";
-        };
-
-        inherit description;
-      };
-    in
-      builtins.mapAttrs toTemplate {
-        basic = "minimal boilerplate for my flakes";
-        full = "big template for complex flakes (using flake-parts)";
-        nixos = "minimal boilerplate for flake-based nixos configuration";
-      };
+    templates = import ./templates;
   };
 }
