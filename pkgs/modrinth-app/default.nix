@@ -28,17 +28,17 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "modrinth-app-unwrapped";
-  version = "unstable-2023-12-28";
+  version = "unstable-2024-01-05";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "f6a697780ba45df606d4535205ac4532f87fbc3c";
-    sha256 = "sha256-i0kTwkvjmHXdEhwTW6TwTXGAEwLtOWu3/GSuOJ8uI1A=";
+    rev = "0d3f007dd4ab5b2fb6dadb09f073c28095b33e33";
+    sha256 = "sha256-pQ+VQLF81feuILmdjZaRJi5bGHv9SCz4MA+qgbljtXc=";
   };
 
   cargoLock = {
-    lockFile = "${src}/Cargo.lock";
+    lockFile = ./Cargo.lock;
     outputHashes = {
       "tauri-plugin-single-instance-0.0.0" = "sha256-G4h2OXKPpZMmradutdUWxGG5axL9XMz2ACAe8AQ40eg=";
     };
@@ -54,6 +54,20 @@ rustPlatform.buildRustPackage rec {
       moreutils
       pnpm
     ];
+
+    env.pnpmPatch = builtins.toJSON {
+      pnpm.supportedArchitectures = {
+        # yes not all of these are available, but this
+        # helps future proof things a little
+        os = ["linux" "darwin"];
+        cpu = ["x64" "arm64"];
+      };
+    };
+
+    postPatch = ''
+      mv theseus_gui/package.json{,.orig}
+      jq --raw-output ". * $pnpmPatch" theseus_gui/package.json.orig > theseus_gui/package.json
+    '';
 
     # https://github.com/NixOS/nixpkgs/blob/763e59ffedb5c25774387bf99bc725df5df82d10/pkgs/applications/misc/pot/default.nix#L56
     installPhase = ''
