@@ -17,6 +17,7 @@ in
     shellcheck-sarif = callPackage ./pkgs/shellcheck-sarif.nix {inherit (final) shellcheck-sarif;};
     flat-manager = callPackage ./pkgs/flat-manager.nix {inherit (final) flat-manager;};
     flat-manager-client = callPackage ./pkgs/flat-manager-client.nix {inherit (final) flat-manager;};
+    flightcore = callPackage ./pkgs/flightcore {inherit (final) flightcore;};
     klassy = prev.libsForQt5.callPackage ./pkgs/klassy.nix {};
 
     modrinth-app-unwrapped = callPackage ./pkgs/modrinth-app {
