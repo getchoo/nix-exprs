@@ -4,6 +4,7 @@
   stdenvNoCC,
   fetchFromGitHub,
   rustPlatform,
+  buildGoModule,
   modrinth-app-unwrapped,
   cacert,
   cargo-tauri,
@@ -20,21 +21,57 @@
 }:
 rustPlatform.buildRustPackage {
   pname = "modrinth-app-unwrapped";
-  version = "unstable-2024-04-07";
+  version = "0.7.1-unstable-2024-04-25";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "theseus";
-    rev = "3e7fd808248003cf87ced405ba7c1d536b596f97";
-    hash = "sha256-W6o0EQLouMU0/NhELa2VL2s75dzzqHgVTxlhR6zwy5g=";
+    rev = "89c7adfbcd64c4f3f19590aacd341337e069e399";
+    hash = "sha256-aSuykZfeGKGA4BeqjIR4bFpah/pKKwVSTNH5upUxeHI=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "tauri-plugin-single-instance-0.0.0" = "sha256-f3CxIg42zsGFG4qxpKklxXh48UVuK9xB+VrNICizcx4=";
+      "tauri-plugin-single-instance-0.0.0" = "sha256-Mf2/cnKotd751ZcSHfiSLNe2nxBfo4dMBdoCwQhe7yI=";
     };
   };
+
+  pnpm-deps = stdenvNoCC.mkDerivation (finalAttrs: {
+    pname = "${modrinth-app-unwrapped.pname}-pnpm-deps";
+    inherit (modrinth-app-unwrapped) version src;
+    sourceRoot = "${finalAttrs.src.name}/theseus_gui";
+
+    dontConfigure = true;
+    dontBuild = true;
+    doCheck = false;
+
+    nativeBuildInputs = [
+      cacert
+      jq
+      moreutils
+      nodePackages.pnpm
+    ];
+
+    # https://github.com/NixOS/nixpkgs/blob/763e59ffedb5c25774387bf99bc725df5df82d10/pkgs/applications/misc/pot/default.nix#L56
+    installPhase = ''
+      export HOME=$(mktemp -d)
+
+      pnpm config set store-dir "$out"
+      pnpm install --frozen-lockfile --ignore-script --force
+
+      # remove timestamp and sort json files
+      rm -rf "$out"/v3/tmp
+      for f in $(find "$out" -name "*.json"); do
+        sed -i -E -e 's/"checkedAt":[0-9]+,//g' $f
+        jq --sort-keys . "$f" | sponge "$f"
+      done
+    '';
+
+    dontFixup = true;
+    outputHashMode = "recursive";
+    outputHash = "sha256-g/uUGfC9TQh0LE8ed51oFY17FySoeTvfaeEpzpNeMao=";
+  });
 
   nativeBuildInputs = [
     cargo-tauri
@@ -67,74 +104,21 @@ rustPlatform.buildRustPackage {
       .${stdenv.hostPlatform.uname.system}
       or (builtins.throw "No tauri bundle available for ${stdenv.hostPlatform.uname.system}!");
 
-    pnpmDeps = stdenvNoCC.mkDerivation (finalAttrs: {
-      pname = "${modrinth-app-unwrapped.pname}-pnpm-deps";
-      inherit (modrinth-app-unwrapped) version src;
-      sourceRoot = "${finalAttrs.src.name}/theseus_gui";
-
-      dontConfigure = true;
-      dontBuild = true;
-      doCheck = false;
-
-      nativeBuildInputs = [
-        cacert
-        jq
-        moreutils
-        nodePackages.pnpm
-      ];
-
-      env.pnpmPatch = builtins.toJSON {
-        pnpm.supportedArchitectures = {
-          # not all of these systems are supported yet,
-          # but this should future proof things for a bit
-          os = [
-            "linux"
-            "darwin"
-          ];
-          cpu = [
-            "x64"
-            "arm64"
-          ];
-        };
-      };
-
-      postPatch = ''
-        mv package.json{,.orig}
-        jq --raw-output ". * $pnpmPatch" package.json.orig > package.json
-      '';
-
-      # https://github.com/NixOS/nixpkgs/blob/763e59ffedb5c25774387bf99bc725df5df82d10/pkgs/applications/misc/pot/default.nix#L56
-      installPhase = ''
-        export HOME=$(mktemp -d)
-
-        pnpm config set store-dir "$out"
-        pnpm install --frozen-lockfile --no-optional --ignore-script
-
-        # remove timestamp and sort json files
-        rm -rf "$out"/v3/tmp
-        for f in $(find "$out" -name "*.json"); do
-          sed -i -E -e 's/"checkedAt":[0-9]+,//g' $f
-          jq --sort-keys . "$f" | sponge "$f"
-        done
-      '';
-
-      dontFixup = true;
-      outputHashMode = "recursive";
-      outputHash = "sha256-p6eZuuGgBPVhcfI50fMo22vpnzoWEhPI7IagowmhTCk=";
-    });
-
     ESBUILD_BINARY_PATH = lib.getExe (
-      esbuild.overrideAttrs (final:
-        lib.const {
-          version = "0.17.19";
-          src = fetchFromGitHub {
-            owner = "evanw";
-            repo = "esbuild";
-            rev = "v${final.version}";
-            hash = "sha256-PLC7OJLSOiDq4OjvrdfCawZPfbfuZix4Waopzrj8qsU=";
-          };
-          vendorHash = "sha256-+BfxCyg0KkDQpHt/wycy/8CTG6YBA/VJvJFhhzUnSiQ=";
-        })
+      esbuild.override {
+        buildGoModule = args:
+          buildGoModule (args
+            // rec {
+              version = "0.20.2";
+              src = fetchFromGitHub {
+                owner = "evanw";
+                repo = "esbuild";
+                rev = "v${version}";
+                hash = "sha256-h/Vqwax4B4nehRP9TaYbdixAZdb1hx373dNxNHvDrtY=";
+              };
+              vendorHash = "sha256-+BfxCyg0KkDQpHt/wycy/8CTG6YBA/VJvJFhhzUnSiQ=";
+            });
+      }
     );
   };
 
@@ -143,7 +127,7 @@ rustPlatform.buildRustPackage {
     export STORE_PATH=$(mktemp -d)
 
     pushd theseus_gui
-    cp -r "$pnpmDeps"/* "$STORE_PATH"
+    cp -rT ${modrinth-app-unwrapped.pnpm-deps} "$STORE_PATH"
     chmod -R +w "$STORE_PATH"
 
     pnpm config set store-dir "$STORE_PATH"

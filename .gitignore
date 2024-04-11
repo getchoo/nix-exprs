@@ -1,3 +1,4 @@
-result
+result*
+repl-result-out*
 .direnv/
 .pre-commit-config.yaml
