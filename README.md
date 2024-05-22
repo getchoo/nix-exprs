@@ -27,8 +27,7 @@ of flakes or in a system configuration.
 
 ### flake-based
 
-flakes are the primary supported method to use this repository - and in my opinion, can offer a much
-nicer user experience :)
+flakes are the primary method to use this repository
 
 #### installing packages
 
@@ -48,6 +47,8 @@ your own revision of nixpkgs
       # this will break reproducibility, but lower the instances of nixpkgs
       # in flake.lock and possibly duplicated dependencies
       # inputs.nixpkgs.follows = "nixpkgs";
+      # if you want to save some space
+      # inputs.flake-checks.follows = "";
     };
   };
 
@@ -72,53 +73,6 @@ your own revision of nixpkgs
 }
 ```
 
-<details>
-<summary>using the overlay</summary>
-
-the overlay (though not preferred for the sake of reproducibility) is also an
-option for those who want to avoid the verbosity of installing packages directly,
-a "plug-n-play" solution to using the packages, and/or a reduction in duplicated dependencies.
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-    darwin = {
-      url = "github:LnL7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    getchoo = {
-      url = "github:getchoo/nix-exprs";
-      # this should probably be used in this scenario as reproducibility is
-      # already broken by using an overlay
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
-
-  outputs = {
-    nixpkgs,
-    getchoo,
-    ...
-  }: {
-    nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./configuration.nix
-
-        ({pkgs, ...}: {
-          nixpkgs.overlays = [getchoo.overlays.default];
-          environment.systemPackages = with pkgs; [
-            treefetch
-          ];
-        })
-      ];
-    };
-  };
-}
-```
-
-</details>
-
 #### ad-hoc installation
 
 this flake can also be used in the base nix package manager!
@@ -132,13 +86,9 @@ nix profile install getchoo#treefetch
 nix shell getchoo#cfspeedtest
 ```
 
-### standard nix
+### stable nix
 
-this repository uses [flake-compat](https://github.com/edolstra/flake-compat) to allow for non-flake environments to use the packages provided.
-
-there are two ways to do this: through channels or `fetchTarball` (or similar functions). i personally recommend
-channels as they are the easiest to update - though if you want to pin a specific revision of this repository,
-`fetchTarball` would probably be a better alternative.
+there are two main ways to use this repository with stable nix: channels and [`npins`](https://github.com/andir/npins) (or similar)
 
 to add the channel, run:
 
@@ -148,75 +98,33 @@ nix-channel --update getchoo
 
 ```
 
-to use `fetchTarball`, please view the [documentation](https://nixos.org/manual/nix/stable/language/builtins.html?highlight=fetchtarball#builtins-fetchTarball) as there are a fair number of ways to use it.
-at it's most basic, you could use this:
+to use `npins`, please view the [getting started guide](https://github.com/andir/npins?tab=readme-ov-file#getting-started) to initialize your project.
+after, run:
 
-```nix
-{
-  getchoo = import (builtins.fetchTarball "https://github.com/getchoo/nix-exprs/archive/main.tar.gz");
-}
+```sh
+npins add --name getchoo github getchoo nix-exprs
 ```
 
 #### installing packages
 
 ```nix
-{pkgs, ...}: let
+{ pkgs, ... }: let
   # if you use channels
   getchoo = import <getchoo>;
 
-  # or if you use `fetchTarball`
-  # getchoo = import (builtins.fetchTarball "https://github.com/getchoo/nix-exprs/archive/main.tar.gz");
+  # or if you use `npins`
+  # sources = import ./npins;
+  # getchoo = import sources.getchoo;
 in {
-  environment.systemPackages = [getchoo.packages.${pkgs.system}.treefetch];
+  environment.systemPackages = [ getchoo.treefetch ];
 }
 ```
-
-<details>
-<summary>with the overlay</summary>
-
-```nix
-{pkgs, ...}: let
-  # if you use channels
-  getchoo = import <getchoo>;
-
-  # or if you use `fetchTarball`
-  # getchoo = import (builtins.fetchTarball "https://github.com/getchoo/nix-exprs/archive/main.tar.gz");
-in {
-  nixpkgs.overlays = [getchoo.overlays.default];
-  environment.systemPackages = [pkgs.treefetch];
-}
-```
-
-</details>
 
 #### ad-hoc installation
 
-there are two ways to use ad-hoc commands: through channels or `overlays.nix`.
-
-channels are again then the preferred method here, where once it's added it can be used
-like so:
+channels are the recommended method of adhoc-installation and usage. after adding it with the command above, you can use it like so:
 
 ```sh
-nix-env -f '<getchoo>' -iA getchoo.packages.x86_64-linux.treefetch # replace x86_64-linux with your system
+nix-env -f '<getchoo>' -iA treefetch
 nix-shell '<getchoo>' -p treefetch
 ```
-
-<details>
-<summary>overlays.nix</summary>
-
-for those who don't want to use this flake's revision of nixpkgs - or have the verbosity
-of the `flake-compat` provided commands - `overlays.nix` is a good option.
-
-in `~/.config/nixpkgs/overlays.nix`:
-
-```nix
-let
-  # if you use channels
-  getchoo = import <getchoo>;
-
-  # or if you use `fetchTarball`
-  # getchoo = import (builtins.fetchTarball "https://github.com/getchoo/nix-exprs/archive/main.tar.gz");
-in [getchoo.overlays.default]
-```
-
-</details>

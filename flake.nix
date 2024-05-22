@@ -56,17 +56,12 @@
         isValid = _: v:
           lib.elem pkgs.system (v.meta.platforms or [pkgs.system]) && !(v.meta.broken or false);
 
-        pkgs' = lib.filterAttrs isValid (import ./. {
-          nixpkgs = pkgs;
-          inherit system;
-        });
+        pkgs' = lib.filterAttrs isValid (import ./. {inherit pkgs;});
       in
         pkgs' // {default = pkgs'.treefetch;}
     );
 
     formatter = forAllSystems (pkgs: pkgs.alejandra);
-
-    overlays.default = final: prev: import ./overlay.nix final prev;
 
     templates = import ./templates;
   };
