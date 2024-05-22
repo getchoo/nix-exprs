@@ -14,7 +14,5 @@ in
     flat-manager = callPackage ./pkgs/flat-manager.nix {inherit (final) flat-manager;};
     flat-manager-client = callPackage ./pkgs/flat-manager-client.nix {inherit (final) flat-manager;};
 
-    klassy = prev.libsForQt5.callPackage ./pkgs/klassy.nix {};
-
     papa = callPackage ./pkgs/papa/package.nix {inherit (final) papa;};
   }
