@@ -1,24 +1,18 @@
-{self, ...}: {
+{self, ...}: let
+  version = self.shortRev or self.dirtyShortRev or "unknown";
+in {
   flake.overlays.default = _: prev: {
-    foo = prev.callPackage ./derivation.nix {inherit self;};
+    hello = prev.callPackage ./derivation.nix {inherit version;};
   };
 
   perSystem = {
-    lib,
     pkgs,
+    self',
     ...
   }: {
-    package = let
-      fixup = lib.filterAttrs (
-        _: v:
-          builtins.elem (v.meta.platforms or []) && !(v.meta.broken or false)
-      );
-
-      unfiltered = lib.fix (final: self.overlays.default final pkgs);
-      pkgs' = fixup unfiltered;
-    in {
-      inherit (pkgs') foo;
-      default = pkgs'.foo;
+    package = {
+      hello = pkgs.callPackage ./derivation.nix {inherit version;};
+      default = self'.packages.hello;
     };
   };
 }
