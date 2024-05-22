@@ -2,40 +2,22 @@
   description = "";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
-    compat = {
-      url = "github:edolstra/flake-compat";
-      flake = false;
-    };
-
-    parts = {
+    flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
 
-    pre-commit = {
-      url = "github:cachix/pre-commit-hooks.nix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        nixpkgs-stable.follows = "nixpkgs";
-        flake-compat.follows = "compat";
-      };
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
     };
   };
 
-  outputs = {
-    parts,
-    pre-commit,
-    ...
-  } @ inputs:
-    parts.lib.mkFlake {inherit inputs;} {
-      imports = [
-        pre-commit.flakeModule
-
-        ./nix/dev.nix
-        ./nix/packages.nix
-      ];
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = [./nix];
 
       systems = [
         "x86_64-linux"
