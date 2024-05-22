@@ -17,6 +17,8 @@ jobs:
           - os: ubuntu-latest
             system: x86_64-linux
           - os: macos-latest
+            system: aarch64-darwin
+          - os: macos-13
             system: x86_64-darwin
           - os: ubuntu-latest
             system: aarch64-linux
@@ -51,8 +53,6 @@ jobs:
       - name: Run build
         run: |
           nix run \
-            --inputs-from . \
-            --override-input nixpkgs nixpkgs \
             github:Mic92/nix-fast-build -- \
             --no-nom \
             --skip-cached \
