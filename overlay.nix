@@ -10,7 +10,6 @@ in
     clippy-sarif = callPackage ./pkgs/clippy-sarif.nix {inherit (final) clippy-sarif;};
     hadolint-sarif = callPackage ./pkgs/hadolint-sarif.nix {inherit (final) hadolint-sarif;};
     sarif-fmt = callPackage ./pkgs/sarif-fmt.nix {inherit (final) sarif-fmt;};
-    shellcheck-sarif = callPackage ./pkgs/shellcheck-sarif.nix {inherit (final) shellcheck-sarif;};
 
     flat-manager = callPackage ./pkgs/flat-manager.nix {inherit (final) flat-manager;};
     flat-manager-client = callPackage ./pkgs/flat-manager-client.nix {inherit (final) flat-manager;};
