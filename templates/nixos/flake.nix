@@ -19,14 +19,14 @@
 
     forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
   in {
-    nixosConfigurations."myHostname" = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.myComputer = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [./configuration.nix];
       specialArgs = {inherit inputs;};
     };
 
     devShells = forAllSystems (pkgs: {
-      default = pkgs.mkShell {
+      default = pkgs.mkShellNoCC {
         packages = with pkgs; [
           just
           fzf
