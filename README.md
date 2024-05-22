@@ -3,6 +3,8 @@
 [![Build status](https://img.shields.io/github/actions/workflow/status/getchoo/nix-exprs/ci.yaml?style=flat-square&logo=github&label=Build%20status&color=5277c3)](https://github.com/getchoo/nix-exprs/actions/workflows/ci.yaml)
 [![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/getchoo/nix-exprs/badge)](https://flakehub.com/flake/getchoo/nix-exprs)
 
+my nix expressions not quite ready for nixpkgs yet - if ever
+
 ## how to use
 
 ### enabling the binary cache
