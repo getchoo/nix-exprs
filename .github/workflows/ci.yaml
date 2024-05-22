@@ -8,6 +8,8 @@ on:
 
 jobs:
   build:
+    name: Build (${{ matrix.system }})
+
     strategy:
       fail-fast: false
       matrix:
@@ -19,17 +21,16 @@ jobs:
           - os: ubuntu-latest
             system: aarch64-linux
 
-    name: Build (${{ matrix.system }})
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup QEMU
         if: matrix.system == 'aarch64-linux'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: "arm64"
+        run: |
+          sudo apt install -y qemu-user-static
 
       - name: Install Nix
         if: matrix.system != 'aarch64-linux'
@@ -49,41 +50,33 @@ jobs:
 
       - name: Run build
         run: |
-          args=(
-            --inputs-from .
-            --override-input nixpkgs nixpkgs
+          nix run \
+            --inputs-from . \
+            --override-input nixpkgs nixpkgs \
             github:Mic92/nix-fast-build -- \
             --no-nom \
             --skip-cached \
-            --systems '${{ matrix.system }}'
+            --systems '${{ matrix.system }}' \
             --option accept-flake-config true \
             --option allow-import-from-derivation false \
             --flake '.#packages'
-          )
-
-          nix run "${args[@]}"
 
   check:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+    name: Check flake
 
-    name: Check flake (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v11
 
       - name: Run check
         run: |
-          args=(
-            --print-build-logs
-            --show-trace
+          nix flake check \
+            --all-systems \
+            --print-build-logs \
+            --show-trace \
             --accept-flake-config
-          )
-
-          nix flake check "${args[@]}"
