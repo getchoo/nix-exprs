@@ -1,31 +1,51 @@
 alias b := build
+alias c := check
 alias dr := dry-run
 alias sw := switch
 alias t := test
 alias u := update
+alias ui := update-input
 
 rebuildArgs := "--verbose"
 rebuild := if os() == "macos" { "darwin-rebuild" } else { "nixos-rebuild" }
-asRoot := if os() == "linux" { "true" } else { "false" }
 
 default:
     @just --choose
 
 [private]
-rebuild subcmd root="false":
-    {{ if root == "true" { "sudo " } else { "" } }}{{ rebuild }} {{ subcmd }} {{ rebuildArgs }} --flake .
+rebuild subcmd *extraArgs="":
+    {{ rebuild }} {{ subcmd }} {{ rebuildArgs }} --flake . {{ extraArgs }}
 
-build:
-    @just rebuild build
+boot *extraArgs="": (rebuild "boot" extraArgs)
 
-dry-run:
-    @just rebuild dry-run
+build *extraArgs="": (rebuild "build" extraArgs)
 
-switch:
-    @just rebuild switch {{ asRoot }}
+dry-run *extraArgs="": (rebuild "dry-run" extraArgs)
 
-test:
-    @just rebuild test {{ asRoot }}
+switch *extraArgs="": (rebuild "switch" extraArgs)
+
+test *extraArgs="": (rebuild "test" extraArgs)
+
+check *args="":
+    nix flake check \
+      --print-build-logs \
+      --show-trace \
+      --accept-flake-config \
+      {{ args }}
+
+eval system *args="":
+    nix eval \
+      --raw \
+      '.#nixosConfigurations.{{ system }}.config.system.build.toplevel' \
+      {{ args }}
 
 update:
-    nix flake update --commit-lock-file
+    nix flake update \
+      --commit-lock-file \
+      --commit-lockfile-summary "flake: update all inputs"
+
+update-input input:
+    nix flake lock \
+      --update-input {{ input }} \
+      --commit-lock-file \
+      --commit-lockfile-summary "flake: update {{ input }}"
