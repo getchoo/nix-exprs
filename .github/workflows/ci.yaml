@@ -32,6 +32,7 @@ jobs:
       - name: Setup QEMU
         if: matrix.system == 'aarch64-linux'
         run: |
+          sudo apt update
           sudo apt install -y qemu-user-static
 
       - name: Install Nix
