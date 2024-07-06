@@ -13,6 +13,7 @@
   outputs =
     { nixpkgs, ... }:
     let
+      inherit (nixpkgs) lib;
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -20,17 +21,15 @@
         "aarch64-darwin"
       ];
 
-      forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
+      forAllSystems = lib.genAttrs systems;
+      nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
     in
     {
       packages = forAllSystems (
-        {
-          lib,
-          pkgs,
-          system,
-          ...
-        }:
+        system:
         let
+          pkgs = nixpkgsFor.${system};
+
           /*
             this filters out packages that may be broken or not supported
             on the current system. packages that have no `broken` or `platforms`
@@ -44,7 +43,7 @@
         pkgs' // { default = pkgs'.treefetch; }
       );
 
-      formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
+      formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
 
       templates = import ./templates;
     };
