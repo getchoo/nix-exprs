@@ -1,20 +1,5 @@
 {
   "nodes": {
-    "flake-checks": {
-      "locked": {
-        "lastModified": 1719755104,
-        "narHash": "sha256-X1nrRnUqSNNWgmDKvRH8I4cc4kCE4Vn6694adXnnGSo=",
-        "owner": "getchoo",
-        "repo": "flake-checks",
-        "rev": "f0e8a00b8af9cfb553bfd7f90d63899158db6df8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "getchoo",
-        "repo": "flake-checks",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1720149507,
@@ -33,7 +18,6 @@
     },
     "root": {
       "inputs": {
-        "flake-checks": "flake-checks",
         "nixpkgs": "nixpkgs"
       }
     }

@@ -8,12 +8,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # this can be removed with `inputs.flake-checks.follows = ""`
-    flake-checks.url = "github:getchoo/flake-checks";
   };
 
   outputs =
-    { nixpkgs, flake-checks, ... }:
+    { nixpkgs, ... }:
     let
       systems = [
         "x86_64-linux"
@@ -25,19 +23,6 @@
       forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
     in
     {
-      checks = forAllSystems (
-        pkgs:
-        let
-          flake-checks' = flake-checks.lib.mkChecks {
-            root = ./.;
-            inherit pkgs;
-          };
-        in
-        {
-          inherit (flake-checks') actionlint deadnix statix;
-        }
-      );
-
       packages = forAllSystems (
         {
           lib,
