@@ -1,17 +1,13 @@
 {
-  perSystem = {
-    pkgs,
-    self',
-    ...
-  }: {
-    devShells = {
-      default = pkgs.mkShell {
-        packages = [
-          self'.formatter
-        ];
+  perSystem =
+    { pkgs, self', ... }:
+    {
+      devShells = {
+        default = pkgs.mkShell {
+          packages = [ self'.formatter ];
 
-        inputsFrom = [self'.packages.hello];
+          inputsFrom = [ self'.packages.hello ];
+        };
       };
     };
-  };
 }

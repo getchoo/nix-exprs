@@ -4,7 +4,9 @@
     ./packages.nix
   ];
 
-  perSystem = {pkgs, ...}: {
-    formatter = pkgs.alejandra;
-  };
+  perSystem =
+    { pkgs, ... }:
+    {
+      formatter = pkgs.alejandra;
+    };
 }

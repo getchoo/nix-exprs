@@ -9,7 +9,10 @@
 writeShellApplication {
   name = "nixgc";
 
-  runtimeInputs = [nix fd];
+  runtimeInputs = [
+    nix
+    fd
+  ];
 
   text = ''
     fd . /nix/var/nix/profiles /home/*/.local/state/nix/profiles -d 3 -t symlink -E '*-link' | while read -r profile; do
@@ -19,7 +22,7 @@ writeShellApplication {
 
   meta = with lib; {
     description = "nix-collect-garbage, but with nix profile";
-    maintainers = [maintainers.getchoo];
+    maintainers = [ maintainers.getchoo ];
     platforms = platforms.linux;
   };
 }

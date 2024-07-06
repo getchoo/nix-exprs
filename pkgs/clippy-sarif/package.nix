@@ -18,20 +18,21 @@ rustPlatform.buildRustPackage rec {
   };
 
   cargoSha256 = "sha256-F3NrqkqLdvMRIuozCMMqwlrrf5QrnmcEhy4TGSzPhiU=";
-  cargoBuildFlags = ["--package" pname];
+  cargoBuildFlags = [
+    "--package"
+    pname
+  ];
   cargoTestFlags = cargoBuildFlags;
 
   passthru = {
-    tests.version = testers.testVersion {
-      package = clippy-sarif;
-    };
+    tests.version = testers.testVersion { package = clippy-sarif; };
   };
 
   meta = with lib; {
     mainProgram = "clippy-sarif";
     description = "A CLI tool to convert clippy diagnostics into SARIF";
     homepage = "https://psastras.github.io/sarif-rs";
-    maintainers = with maintainers; [getchoo];
+    maintainers = with maintainers; [ getchoo ];
     license = licenses.mit;
     inherit (clippy.meta) platforms;
   };
