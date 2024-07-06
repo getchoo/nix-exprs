@@ -27,8 +27,11 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-t2c/eaQLEKLzJEvyY35Kithon5K5Bes3OWmQgExigzI=";
 
-  nativeBuildInputs = [pkg-config installShellFiles];
-  buildInputs = [openssl];
+  nativeBuildInputs = [
+    pkg-config
+    installShellFiles
+  ];
+  buildInputs = [ openssl ];
 
   postInstall = ''
     installShellCompletion --cmd papa \
@@ -38,9 +41,9 @@ rustPlatform.buildRustPackage rec {
   '';
 
   passthru = {
-    tests.version = testers.testVersion {package = papa;};
+    tests.version = testers.testVersion { package = papa; };
 
-    updateScript = nix-update-script {};
+    updateScript = nix-update-script { };
 
     libthermite = fetchFromGitHub {
       owner = "AnActualEmerald";
@@ -56,7 +59,7 @@ rustPlatform.buildRustPackage rec {
     changelog = "https://github.com/AnActualEmerald/papa/releases/tag/v${src.version}";
     mainProgram = "papa";
     license = licenses.mit;
-    maintainers = with maintainers; [getchoo];
+    maintainers = with maintainers; [ getchoo ];
     platforms = platforms.unix;
   };
 }

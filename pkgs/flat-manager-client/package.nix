@@ -15,8 +15,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     tenacity
   ];
 
-  nativeBuildInputs = [python3.pkgs.wrapPython];
-  buildInputs = [(python3.withPackages (lib.const finalAttrs.pythonPath))];
+  nativeBuildInputs = [ python3.pkgs.wrapPython ];
+  buildInputs = [ (python3.withPackages (lib.const finalAttrs.pythonPath)) ];
 
   installPhase = ''
     runHook preInstall
@@ -26,16 +26,14 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   postFixup = ''
     makeWrapperArgs+=(
-      --prefix GI_TYPELIB_PATH : ${lib.makeSearchPath "lib/girepository-1.0" [ostree]}
+      --prefix GI_TYPELIB_PATH : ${lib.makeSearchPath "lib/girepository-1.0" [ ostree ]}
     )
 
     wrapPythonPrograms $out/bin $out "$pythonPath"
   '';
 
-  meta =
-    flat-manager.meta
-    // {
-      mainProgram = "flat-manager-client";
-      description = flat-manager.meta.description + " (Client)";
-    };
+  meta = flat-manager.meta // {
+    mainProgram = "flat-manager-client";
+    description = flat-manager.meta.description + " (Client)";
+  };
 })

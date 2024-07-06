@@ -22,8 +22,13 @@ rustPlatform.buildRustPackage {
 
   cargoHash = "sha256-xdJYSVH7l31/LpgS615D7kcvjxILFPMiVWDDvmm/3VE=";
 
-  nativeBuildInputs = [pkg-config];
-  buildInputs = [glib openssl ostree postgresql];
+  nativeBuildInputs = [ pkg-config ];
+  buildInputs = [
+    glib
+    openssl
+    ostree
+    postgresql
+  ];
 
   meta = with lib; {
     mainProgram = "flat-manager";
@@ -35,7 +40,7 @@ rustPlatform.buildRustPackage {
     '';
     homepage = "https://github.com/flatpak/flat-manager";
     changelog = "https://github.com/flatpak/flat-manager/releases/tag/${flat-manager.version}";
-    maintainers = with maintainers; [getchoo];
+    maintainers = with maintainers; [ getchoo ];
     platforms = platforms.linux;
   };
 }
