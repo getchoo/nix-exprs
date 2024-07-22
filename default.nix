@@ -17,20 +17,18 @@ in
   system ? builtins.currentSystem,
 }:
 let
-  packages =
-    lib.packagesFromDirectoryRecursive {
-      inherit (pkgs) callPackage;
-      directory = ./pkgs;
-    }
-    // {
-      flat-manager = pkgs.callPackage ./pkgs/flat-manager/package.nix {
-        inherit (packages) flat-manager;
-      };
-      flat-manager-client = pkgs.callPackage ./pkgs/flat-manager-client/package.nix {
-        inherit (packages) flat-manager;
-      };
+  packageDirectory = ./pkgs;
 
-      papa = pkgs.callPackage ./pkgs/papa/package.nix { inherit (packages) papa; };
-    };
+  scope = lib.makeScope pkgs.newScope (
+    final:
+    lib.packagesFromDirectoryRecursive {
+      inherit (final) callPackage;
+      directory = packageDirectory;
+    }
+  );
+
+  # Filter extraneous attributes from the scope, based on the files in our package directory
+  packageFileNames = builtins.attrNames (builtins.readDir packageDirectory);
+  packages = lib.getAttrs packageFileNames scope;
 in
 packages
