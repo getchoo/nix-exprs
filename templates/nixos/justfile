@@ -1,51 +1,22 @@
-alias b := build
-alias c := check
-alias dr := dry-run
+alias b := boot
+alias s := switch
 alias sw := switch
 alias t := test
-alias u := update
-alias ui := update-input
 
-rebuildArgs := "--verbose"
 rebuild := if os() == "macos" { "darwin-rebuild" } else { "nixos-rebuild" }
 
 default:
-    @just --choose
+	@just --choose
 
-[private]
-rebuild subcmd *extraArgs="":
-    {{ rebuild }} {{ subcmd }} {{ rebuildArgs }} --flake . {{ extraArgs }}
+# Wrapper for `nixos-rebuild`. See `man nixos-rebuild`
+rebuild subcmd *args="":
+    {{ rebuild }} {{ subcmd }} --flake . {{ args }}
 
-boot *extraArgs="": (rebuild "boot" extraArgs)
+# Switch to your new configuration when you reboot
+boot *args="": (rebuild "boot" args)
 
-build *extraArgs="": (rebuild "build" extraArgs)
+# Immediately switch to your new configuration
+switch *args="": (rebuild "switch" args)
 
-dry-run *extraArgs="": (rebuild "dry-run" extraArgs)
-
-switch *extraArgs="": (rebuild "switch" extraArgs)
-
-test *extraArgs="": (rebuild "test" extraArgs)
-
-check *args="":
-    nix flake check \
-      --print-build-logs \
-      --show-trace \
-      --accept-flake-config \
-      {{ args }}
-
-eval system *args="":
-    nix eval \
-      --raw \
-      '.#nixosConfigurations.{{ system }}.config.system.build.toplevel' \
-      {{ args }}
-
-update:
-    nix flake update \
-      --commit-lock-file \
-      --commit-lockfile-summary "flake: update all inputs"
-
-update-input input:
-    nix flake lock \
-      --update-input {{ input }} \
-      --commit-lock-file \
-      --commit-lockfile-summary "flake: update {{ input }}"
+# Temporarily switch to your new configuration
+test *args="": (rebuild "test" args)

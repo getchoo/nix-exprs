@@ -2,7 +2,8 @@
   description = "my cool flake";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -10,8 +11,9 @@
   };
 
   outputs =
-    { nixpkgs, ... }@inputs:
+    { self, nixpkgs, ... }@inputs:
     let
+      inherit (nixpkgs) lib;
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -19,26 +21,36 @@
         "aarch64-darwin"
       ];
 
-      forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
+      forAllSystems = lib.genAttrs systems;
+      nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
     in
     {
       nixosConfigurations.myComputer = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [ ./configuration.nix ];
+        modules = [ ./configuration.nix ]; # You should already have this
         specialArgs = {
+          # Gives your configuration.nix access to the inputs from above
           inherit inputs;
         };
       };
 
-      devShells = forAllSystems (pkgs: {
-        default = pkgs.mkShellNoCC {
-          packages = with pkgs; [
-            just
-            fzf
-          ];
-        };
-      });
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
+          default = pkgs.mkShellNoCC {
+            packages = [
+              pkgs.fzf
+              pkgs.just
+              # Lets you run `nixfmt` to format all of your files
+              self.formatter.${system}
+            ];
+          };
+        }
+      );
 
-      formatter = forAllSystems (pkgs: pkgs.alejandra);
+      # You can also use `nix fmt`
+      formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
     };
 }

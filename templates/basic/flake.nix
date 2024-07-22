@@ -2,12 +2,13 @@
   description = "";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
   outputs =
-    { self, nixpkgs, ... }:
+    { self, nixpkgs }:
     let
+      inherit (nixpkgs) lib;
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -15,31 +16,55 @@
         "aarch64-darwin"
       ];
 
-      forAllSystems = fn: nixpkgs.lib.genAttrs systems (sys: fn nixpkgs.legacyPackages.${sys});
-      version = self.shortRev or self.dirtyShortRev or "unknown";
+      forAllSystems = fn: lib.genAttrs systems;
+      nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
     in
     {
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
+          nixfmt = pkgs.runCommand "check-nixfmt" ''
+            cd ${self}
+
+            echo "Running nixfmt..."
+            ${lib.getExe self.formatter.${system}}--check .
+
+            touch $out
+          '';
+        }
+      );
+
       devShells = forAllSystems (
-        { pkgs, system, ... }:
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
         {
           default = pkgs.mkShell {
-            packages = with pkgs; [ bash ];
+            packages = [ pkgs.bash ];
 
             inputsFrom = [ self.packages.${system}.hello ];
           };
         }
       );
 
-      formatter = forAllSystems (pkgs: pkgs.alejandra);
+      formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
 
       packages = forAllSystems (
-        { pkgs, system, ... }:
-        {
-          hello = pkgs.callPackage ./. { inherit version; };
-          default = self.packages.${system}.hello;
-        }
-      );
+        system:
+        let
+          pkgs = import ./. {
+            inherit system nixpkgs lib;
+            pkgs = nixpkgsFor.${system};
+          };
 
-      overlays.default = _: prev: { hello = prev.callPackage ./. { inherit version; }; };
+          isAvailable = lib.meta.availableOn { inherit system; };
+          pkgs' = lib.filterAttrs (_: isAvailable) pkgs;
+        in
+        pkgs // { default = pkgs'.hello; }
+      );
     };
 }
