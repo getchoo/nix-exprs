@@ -61,6 +61,6 @@
 
       formatter = forAllSystems (system: treefmtFor.${system}.config.build.wrapper);
 
-      templates = import ./templates;
+      templates = import ./templates self;
     };
 }

@@ -1,11 +1,8 @@
+self:
 let
   # string -> string -> {}
   toTemplate = name: description: {
-    path = builtins.path {
-      path = ./${name};
-      name = "${name}-template";
-    };
-
+    path = self + "/templates/" + name;
     inherit description;
   };
 in
