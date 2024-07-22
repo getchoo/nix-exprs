@@ -5,7 +5,7 @@
   # https://github.com/numtide/treefmt-nix/pull/146
   programs = {
     deadnix.enable = true;
-    nixfmt-rfc-style.enable = true;
+    nixfmt.enable = true;
     statix.enable = true;
   };
 }
