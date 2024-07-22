@@ -17,22 +17,20 @@ in
   system ? builtins.currentSystem,
 }:
 let
-  inherit (pkgs) callPackage;
-in
-lib.fix (
-  final:
-  lib.packagesFromDirectoryRecursive {
-    inherit callPackage;
-    directory = ./pkgs;
-  }
-  // {
-    clippy-sarif = callPackage ./pkgs/clippy-sarif/package.nix { inherit (final) clippy-sarif; };
+  packages =
+    lib.packagesFromDirectoryRecursive {
+      inherit (pkgs) callPackage;
+      directory = ./pkgs;
+    }
+    // {
+      flat-manager = pkgs.callPackage ./pkgs/flat-manager/package.nix {
+        inherit (packages) flat-manager;
+      };
+      flat-manager-client = pkgs.callPackage ./pkgs/flat-manager-client/package.nix {
+        inherit (packages) flat-manager;
+      };
 
-    flat-manager = callPackage ./pkgs/flat-manager/package.nix { inherit (final) flat-manager; };
-    flat-manager-client = callPackage ./pkgs/flat-manager-client/package.nix {
-      inherit (final) flat-manager;
+      papa = pkgs.callPackage ./pkgs/papa/package.nix { inherit (packages) papa; };
     };
-
-    papa = callPackage ./pkgs/papa/package.nix { inherit (final) papa; };
-  }
-)
+in
+packages

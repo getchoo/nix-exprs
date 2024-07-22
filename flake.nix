@@ -45,15 +45,16 @@
         let
           pkgs = nixpkgsFor.${system};
 
-          /*
-            this filters out packages that may be broken or not supported
-            on the current system. packages that have no `broken` or `platforms`
-            meta attribute are assumed to be valid
-          */
-          isValid =
-            _: v: lib.elem pkgs.system (v.meta.platforms or [ pkgs.system ]) && !(v.meta.broken or false);
+          isAvailable = lib.meta.availableOn { inherit system; };
 
-          pkgs' = lib.filterAttrs isValid (import ./. { inherit pkgs; });
+          pkgs' = lib.filterAttrs (lib.const isAvailable) (
+            import ./. {
+              inherit system;
+              inherit nixpkgs;
+              inherit pkgs;
+              inherit (pkgs) lib;
+            }
+          );
         in
         pkgs' // { default = pkgs'.treefetch; }
       );
