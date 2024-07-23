@@ -16,7 +16,7 @@
         "aarch64-darwin"
       ];
 
-      forAllSystems = fn: lib.genAttrs systems;
+      forAllSystems = lib.genAttrs systems;
       nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
     in
     {
