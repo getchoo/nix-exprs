@@ -20,7 +20,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v14
 
       - name: Update lockfile & make PR
-        uses: DeterminateSystems/update-flake-lock@v23
+        uses: DeterminateSystems/update-flake-lock@v24
         id: update
         with:
           commit-msg: "flake: update inputs"
