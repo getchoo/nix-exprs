@@ -11,10 +11,10 @@ rustPlatform.buildRustPackage {
     owner = "angelofallars";
     repo = "treefetch";
     rev = "02f65e11e1f23d5fa9e66335eb5ff4f2f6b01400";
-    sha256 = "sha256-FDiulTit492KwV46A3qwjHQwzpjVJvIXTfTrMufXd5k=";
+    hash = "sha256-FDiulTit492KwV46A3qwjHQwzpjVJvIXTfTrMufXd5k=";
   };
 
-  cargoSha256 = "sha256-8HJYYPBogkgEfK3kv8dFUFaqUhvgYAOrhUIyZo3bqp8=";
+  cargoHash = "sha256-8HJYYPBogkgEfK3kv8dFUFaqUhvgYAOrhUIyZo3bqp8=";
 
   meta = with lib; {
     description = "A plant-based system fetch tool made with Rust.";
