@@ -7,7 +7,6 @@ in
     overlays = [ ];
     inherit system;
   },
-  lib ? pkgs.lib,
   nixpkgs ? (
     fetchTarball {
       url = "https://github.com/NixOS/nixpkgs/archive/${lock.nodes.nixpkgs.locked.rev}.tar.gz";
@@ -17,6 +16,7 @@ in
   system ? builtins.currentSystem,
 }:
 let
+  inherit (pkgs) lib;
   packageDirectory = ./pkgs;
 
   scope = lib.makeScope pkgs.newScope (
