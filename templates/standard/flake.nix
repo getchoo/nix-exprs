@@ -1,14 +1,13 @@
 {
   description = "";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs =
     { self, nixpkgs }:
     let
       inherit (nixpkgs) lib;
+
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -17,20 +16,21 @@
       ];
 
       forAllSystems = lib.genAttrs systems;
-      nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
+      nixpkgsFor = nixpkgs.legacyPackages;
     in
     {
       checks = forAllSystems (
         system:
         let
           pkgs = nixpkgsFor.${system};
+
+          mkCheck =
+            name: deps: script:
+            pkgs.runCommand name { nativeBuildInputs = deps; } script;
         in
         {
-          nixfmt = pkgs.runCommand "check-nixfmt" ''
-            cd ${self}
-
-            echo "Running nixfmt..."
-            ${lib.getExe self.formatter.${system}}--check .
+          nixfmt = mkCheck "check-nixfmt" [ pkgs.nixfmt-rfc-style ] ''
+            nixfmt --check ${self}
 
             touch $out
           '';
@@ -56,15 +56,14 @@
       packages = forAllSystems (
         system:
         let
-          pkgs = import ./. {
-            inherit system nixpkgs lib;
+          pkgs = import ./default.nix {
             pkgs = nixpkgsFor.${system};
           };
 
           isAvailable = lib.meta.availableOn { inherit system; };
           pkgs' = lib.filterAttrs (_: isAvailable) pkgs;
         in
-        pkgs // { default = pkgs'.hello; }
+        pkgs // { default = pkgs'.hello or pkgs.emptyFile; }
       );
     };
 }

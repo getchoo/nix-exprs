@@ -4,10 +4,9 @@
     config = { };
     overlays = [ ];
   },
-  lib ? pkgs.lib,
   nixpkgs ? <nixpkgs>,
   system ? builtins.currentSystem,
 }:
 {
-  inherit (pkgs) lib;
+  inherit (pkgs) hello;
 }

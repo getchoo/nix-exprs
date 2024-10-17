@@ -1,5 +1,5 @@
-alias b := boot
-alias s := switch
+alias bo := boot
+alias bu := build
 alias sw := switch
 alias t := test
 
@@ -14,6 +14,9 @@ rebuild subcmd *args="":
 
 # Switch to your new configuration when you reboot
 boot *args="": (rebuild "boot" args)
+
+# Build your new configuration
+build *args="": (rebuild "build" args)
 
 # Immediately switch to your new configuration
 switch *args="": (rebuild "switch" args)

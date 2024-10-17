@@ -63,9 +63,8 @@
           };
         in
         lib.mapAttrs toTemplate {
-          basic = "Minimal boilerplate for my Flakes";
-          full = "Big template for complex Flakes (using flake-parts)";
-          nixos = "minimal boilerplate for a Flake-based NixOS configuration";
+          standard = "Minimal boilerplate for my Flakes";
+          nixos = "Minimal boilerplate for a Flake-based NixOS configuration";
         };
     };
 }
