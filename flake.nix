@@ -24,6 +24,18 @@
       forAllSystems = lib.genAttrs systems;
       forTier1Systems = lib.genAttrs tier1Systems;
       nixpkgsFor = nixpkgs.legacyPackages;
+
+      mkModule =
+        {
+          name,
+          type,
+          imports,
+        }:
+        {
+          __file = "${self.outPath}/flake.nix#${type}Modules.${name}";
+          inherit imports;
+        };
+
     in
     {
       checks = forTier1Systems (
@@ -52,6 +64,14 @@
         in
         pkgs' // { default = pkgs'.treefetch or pkgs.emptyFile; }
       );
+
+      homeModules = {
+        riff = mkModule {
+          name = "riff";
+          type = "home";
+          imports = [ ./modules/home/riff.nix ];
+        };
+      };
 
       formatter = forTier1Systems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
 
