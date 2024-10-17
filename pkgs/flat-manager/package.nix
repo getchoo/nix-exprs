@@ -1,28 +1,29 @@
 {
   lib,
-  rustPlatform,
   fetchFromGitHub,
-  flat-manager,
   glib,
   openssl,
   ostree,
-  postgresql,
   pkg-config,
+  postgresql,
+  rustPlatform,
 }:
-rustPlatform.buildRustPackage {
+
+rustPlatform.buildRustPackage rec {
   pname = "flat-manager";
-  version = "unstable-2024-01-20";
+  version = "0.4.3.3";
 
   src = fetchFromGitHub {
     owner = "flatpak";
-    repo = flat-manager.pname;
-    rev = "d1c3d36da7b5779163ff70007c4d2f145cfce664";
-    hash = "sha256-Gt3c+fIC0W6+OJ4m6ujmS1nB9Nnr39oHlzxaKCxGAag=";
+    repo = "flat-manager";
+    rev = "refs/tags/${version}";
+    hash = "sha256-MGsxXY7PXUOTha+8lwr9HYdM4dDMA4wpqhbMleZPtX4=";
   };
 
-  cargoHash = "sha256-xdJYSVH7l31/LpgS615D7kcvjxILFPMiVWDDvmm/3VE=";
+  cargoHash = "sha256-q1MVDzoRO+G62cjX7ctORaPzba8Hh8V6IL8xVmTJJ48=";
 
   nativeBuildInputs = [ pkg-config ];
+
   buildInputs = [
     glib
     openssl
@@ -30,8 +31,7 @@ rustPlatform.buildRustPackage {
     postgresql
   ];
 
-  meta = with lib; {
-    mainProgram = "flat-manager";
+  meta = {
     description = "Manager for flatpak repositories";
     longDescription = ''
       flat-manager serves and maintains a Flatpak repository. You point it at an ostree
@@ -39,8 +39,9 @@ rustPlatform.buildRustPackage {
       Additionally, it has an HTTP API that lets you upload new builds and manage the repository.
     '';
     homepage = "https://github.com/flatpak/flat-manager";
-    changelog = "https://github.com/flatpak/flat-manager/releases/tag/${flat-manager.version}";
-    maintainers = with maintainers; [ getchoo ];
-    platforms = platforms.linux;
+    changelog = "https://github.com/flatpak/flat-manager/releases/tag/${version}";
+    maintainers = with lib.maintainers; [ getchoo ];
+    mainProgram = "flat-manager";
+    platforms = lib.platforms.linux;
   };
 }
