@@ -62,20 +62,6 @@ jobs:
             --option allow-import-from-derivation false \
             --flake '.#packages'
 
-  build-gate:
-    name: Build gate
-
-    if: ${{ always() }}
-
-    needs: build
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Exit with error
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: exit 1
-
   check:
     name: Check flake
 
@@ -95,3 +81,16 @@ jobs:
             --print-build-logs \
             --show-trace \
             --accept-flake-config
+
+  build-gate:
+    name: Build gate
+    needs: build
+
+    if: ${{ always() }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Exit with error
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
