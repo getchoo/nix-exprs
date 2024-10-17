@@ -1,5 +1,5 @@
 {
-  description = "my cool flake";
+  description = "My cool Nix Flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -14,6 +14,7 @@
     { self, nixpkgs, ... }@inputs:
     let
       inherit (nixpkgs) lib;
+
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -22,7 +23,7 @@
       ];
 
       forAllSystems = lib.genAttrs systems;
-      nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
+      nixpkgsFor = nixpkgs.legacyPackages;
     in
     {
       nixosConfigurations.myComputer = nixpkgs.lib.nixosSystem {
@@ -43,6 +44,7 @@
             packages = [
               pkgs.fzf
               pkgs.just
+
               # Lets you run `nixfmt` to format all of your files
               self.formatter.${system}
             ];
