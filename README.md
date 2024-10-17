@@ -3,47 +3,49 @@
 [![Build status](https://img.shields.io/github/actions/workflow/status/getchoo/nix-exprs/ci.yaml?style=flat-square&logo=github&label=Build%20status&color=5277c3)](https://github.com/getchoo/nix-exprs/actions/workflows/ci.yaml)
 [![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/getchoo/nix-exprs/badge)](https://flakehub.com/flake/getchoo/nix-exprs)
 
-my nix expressions not quite ready for nixpkgs yet - if ever
+My nix expressions not quite ready for nixpkgs yet - if ever
 
-## how to use
+## How to Use
 
-### enabling the binary cache
+### Enabling the Binary Cache
 
-all packages are cached by [cachix](https://cachix.org). to enable it, you can run
-`nix run nixpkgs#cachix use getchoo`. it may may also be used in the `nixConfig` attribute
-of flakes or in a system configuration.
+All packages are cached by [cachix](https://cachix.org). To enable it, you can run
+`nix run nixpkgs#cachix use getchoo`. It may may also be used in the `nixConfig` attribute
+of Flakes or in a system configuration.
 
 <details>
-<summary>example</summary>
+<summary>Example</summary>
 
 ```nix
-{pkgs, ...}: {
+{ pkgs, ... }: {
   nix.settings = {
-    trusted-substituters = ["https://getchoo.cachix.org"];
-    trusted-public-keys = ["getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE="];
+    trusted-substituters = [ "https://getchoo.cachix.org" ];
+    trusted-public-keys = [ "getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE=" ];
   };
 }
 ```
 
 </details>
 
-### flake-based
+### Flake-based
 
-flakes are the primary method to use this repository
+Flakes are the primary method to use this repository
 
-#### installing packages
+#### Installing Packages
 
-you can add this repository as an input, and optionally override the nixpkgs input to build against
+You can add this repository as an input, and optionally override the nixpkgs input to build against
 your own revision of nixpkgs
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+
     darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     getchoo = {
       url = "github:getchoo/nix-exprs";
       # this will break reproducibility, but lower the instances of nixpkgs
@@ -54,79 +56,83 @@ your own revision of nixpkgs
     };
   };
 
-  outputs = {
-    nixpkgs,
-    getchoo,
-    ...
-  }: {
-    nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./configuration.nix
-
-        ({pkgs, ...}: {
-          environment.systemPackages = with getchoo.packages.${pkgs.system}; [
-            treefetch
-          ];
-        })
-      ];
+  outputs =
+    { nixpkgs, getchoo, ... }:
+    {
+      nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
+        modules = [
+          ./configuration.nix
+          (
+            { pkgs, ... }:
+            let
+              inherit (pkgs.stdenv.hostPlatform) system;
+            in
+            {
+              environment.systemPackages = [
+                getchoo.packages.${system}.treefetch
+              ];
+            }
+          )
+        ];
+      };
     };
-  };
 }
 ```
 
-#### ad-hoc installation
+#### Ad-hoc Installation
 
-this flake can also be used in the base nix package manager!
+This Flake can also be used in the base Nix package manager!
 
-the best way to make these packages available for you is to
-add it to your flake registry like so.
+The best way to make these packages available for you is to
+add it to your flake registry like so:
 
-```sh
-nix registry add getchoo github:getchoo/nix-exprs
-nix profile install getchoo#treefetch
-nix shell getchoo#cfspeedtest
+```console
+$ nix registry add getchoo 'github:getchoo/nix-exprs'
+$ nix profile install 'getchoo#treefetch'
+$ nix shell 'getchoo#treefetch'
 ```
 
-### stable nix
+### Stable Nix
 
-there are two main ways to use this repository with stable nix: channels and [`npins`](https://github.com/andir/npins) (or similar)
+There are two main ways to use this repository with stable Nix: channels and [`npins`](https://github.com/andir/npins) (or similar)
 
-to add the channel, run:
+To add the channel, run:
 
-```sh
-nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo
-nix-channel --update getchoo
-
+```console
+$ nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo
+$ nix-channel --update getchoo
 ```
 
-to use `npins`, please view the [getting started guide](https://github.com/andir/npins?tab=readme-ov-file#getting-started) to initialize your project.
-after, run:
+To use `npins`, please view their [Getting Started guide](https://github.com/andir/npins?tab=readme-ov-file#getting-started) to initialize your project.
+After, run:
 
-```sh
-npins add --name getchoo github getchoo nix-exprs
+```console
+$ npins add --name getchoo github getchoo nix-exprs
 ```
 
-#### installing packages
+#### Installing Packages
 
 ```nix
 { pkgs, ... }: let
-  # if you use channels
-  getchoo = import <getchoo>;
+  # If you use channels
+  getchoo = import <getchoo> {
+    # Add this if you want to use your own nixpkgs
+    inherit pkgs;
+  };
 
-  # or if you use `npins`
+  # Or if you use `npins`
   # sources = import ./npins;
-  # getchoo = import sources.getchoo;
+  # getchoo = import sources.getchoo { };
 in {
   environment.systemPackages = [ getchoo.treefetch ];
 }
 ```
 
-#### ad-hoc installation
+#### Ad-hoc Installation
 
-channels are the recommended method of adhoc-installation and usage. after adding it with the command above, you can use it like so:
+Channels are the recommended method of adhoc-installation and usage. After adding it with the command above, you can use it like so:
 
-```sh
-nix-env -f '<getchoo>' -iA treefetch
-nix-shell '<getchoo>' -p treefetch
+```console
+$ nix-env -f '<getchoo>' -iA treefetch
+$ nix-shell '<getchoo>' -p treefetch
 ```
