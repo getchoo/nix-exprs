@@ -30,12 +30,16 @@
           name,
           type,
           imports,
-        }:
+          ...
+        }@args:
         {
-          __file = "${self.outPath}/flake.nix#${type}Modules.${name}";
+          _file = "${self.outPath}/flake.nix#${type}Modules.${name}";
           inherit imports;
-        };
-
+        }
+        // lib.removeAttrs args [
+          "name"
+          "type"
+        ];
     in
     {
       checks = forTier1Systems (
@@ -64,6 +68,16 @@
         in
         pkgs' // { default = pkgs'.treefetch or pkgs.emptyFile; }
       );
+
+      flakeModules = {
+        configs = mkModule {
+          name = "configs";
+          type = "flake";
+          imports = [ ./modules/flake/configs.nix ];
+          key = "${self.outPath}/flake.nix#flakeModules.configs";
+          _class = "flake";
+        };
+      };
 
       homeModules = {
         riff = mkModule {
