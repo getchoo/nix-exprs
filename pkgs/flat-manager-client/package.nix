@@ -1,22 +1,32 @@
 {
-  lib,
-  stdenvNoCC,
   flat-manager,
-  python3,
+  gobject-introspection,
   ostree,
+  python3,
+  stdenvNoCC,
+  wrapGAppsNoGuiHook,
 }:
+
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "flat-manager-client";
   inherit (flat-manager) version src;
 
-  pythonPath = with python3.pkgs; [
+  nativeBuildInputs = [
+    gobject-introspection
+    python3
+    python3.pkgs.wrapPython
+    wrapGAppsNoGuiHook
+  ];
+
+  buildInputs = [ ostree ];
+
+  propagatedBuildInputs = with python3.pkgs; [
+    python
+
     aiohttp
     pygobject3
     tenacity
   ];
-
-  nativeBuildInputs = [ python3.pkgs.wrapPython ];
-  buildInputs = [ (python3.withPackages (lib.const finalAttrs.pythonPath)) ];
 
   installPhase = ''
     runHook preInstall
@@ -24,16 +34,18 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  postFixup = ''
-    makeWrapperArgs+=(
-      --prefix GI_TYPELIB_PATH : ${lib.makeSearchPath "lib/girepository-1.0" [ ostree ]}
-    )
+  makeWrapperArgs = [ "\${gappsWrapperArgs[@]}" ];
 
-    wrapPythonPrograms $out/bin $out "$pythonPath"
-  '';
+  postFixup = "wrapPythonPrograms";
 
-  meta = flat-manager.meta // {
-    mainProgram = "flat-manager-client";
+  meta = {
+    inherit (flat-manager.meta)
+      homepage
+      changelog
+      maintainers
+      platforms
+      ;
     description = flat-manager.meta.description + " (Client)";
+    mainProgram = "flat-manager-client";
   };
 })
