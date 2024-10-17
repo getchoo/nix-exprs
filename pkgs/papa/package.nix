@@ -1,14 +1,15 @@
 {
   lib,
-  rustPlatform,
   fetchFromGitHub,
-  papa,
   installShellFiles,
   nix-update-script,
-  testers,
   openssl,
+  papa,
   pkg-config,
+  rustPlatform,
+  testers,
 }:
+
 rustPlatform.buildRustPackage rec {
   pname = "papa";
   version = "4.1.0-rc.4";
@@ -16,7 +17,7 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "AnActualEmerald";
     repo = "papa";
-    rev = "v${version}";
+    rev = "refs/tags/v${version}";
     hash = "sha256-XAYenoWLKeNzNozFRPz84WDeU0/y2hd/wgr3UeZLFS0=";
   };
 
@@ -31,6 +32,7 @@ rustPlatform.buildRustPackage rec {
     pkg-config
     installShellFiles
   ];
+
   buildInputs = [ openssl ];
 
   postInstall = ''
@@ -41,25 +43,25 @@ rustPlatform.buildRustPackage rec {
   '';
 
   passthru = {
-    tests.version = testers.testVersion { package = papa; };
-
-    updateScript = nix-update-script { };
-
     libthermite = fetchFromGitHub {
       owner = "AnActualEmerald";
       repo = "thermite";
       rev = "8e6fc6af20e9bd2af4313fee65dfed05cfa1bbd5";
       hash = "sha256-7zkXW2G7cwyobYJO22o1QoJRs2O6sD7/S9frZ/+DNIQ=";
     };
+
+    tests.version = testers.testVersion { package = papa; };
+
+    updateScript = nix-update-script { };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Mod manager for Northstar clients and servers";
     homepage = "https://github.com/AnActualEmerald/papa";
-    changelog = "https://github.com/AnActualEmerald/papa/releases/tag/v${src.version}";
+    changelog = "https://github.com/AnActualEmerald/papa/releases/tag/v${version}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ getchoo ];
     mainProgram = "papa";
-    license = licenses.mit;
-    maintainers = with maintainers; [ getchoo ];
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
   };
 }
