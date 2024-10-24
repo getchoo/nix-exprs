@@ -51,6 +51,12 @@ jobs:
           name: getchoo
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
+      - name: Evaluate flake
+        run: |
+          nix flake check \
+            --no-build \
+            --show-trace
+
       - name: Run build
         run: |
           nix run \
@@ -60,7 +66,7 @@ jobs:
             --systems '${{ matrix.system }}' \
             --option accept-flake-config true \
             --option allow-import-from-derivation false \
-            --flake '.#packages'
+            --flake '.#packages.${{ matrix.system }}'
 
   check:
     name: Check flake
@@ -77,10 +83,9 @@ jobs:
       - name: Run check
         run: |
           nix flake check \
-            --all-systems \
+            --accept-flake-config \
             --print-build-logs \
-            --show-trace \
-            --accept-flake-config
+            --show-trace
 
   build-gate:
     name: Build gate
