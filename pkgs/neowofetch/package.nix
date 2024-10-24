@@ -7,7 +7,7 @@
   pciutils,
   stdenvNoCC,
   ueberzug,
-  withX11Support ? true,
+  withX11Support ? stdenvNoCC.hostPlatform.isLinux,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
