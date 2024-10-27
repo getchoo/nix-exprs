@@ -61,12 +61,13 @@ jobs:
         run: |
           nix run \
             github:Mic92/nix-fast-build -- \
+            --flake '.#packages.${{ matrix.system }}' \
             --no-nom \
-            --skip-cached \
-            --systems '${{ matrix.system }}' \
             --option accept-flake-config true \
             --option allow-import-from-derivation false \
-            --flake '.#packages.${{ matrix.system }}'
+            --option restrict-eval true \
+            --skip-cached \
+            --systems '${{ matrix.system }}'
 
   check:
     name: Check flake
@@ -84,7 +85,9 @@ jobs:
         run: |
           nix flake check \
             --accept-flake-config \
+            --no-allow-import-from-derivation \
             --print-build-logs \
+            --restrict-eval \
             --show-trace
 
   build-gate:
