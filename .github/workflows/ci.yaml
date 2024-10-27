@@ -30,20 +30,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup QEMU
-        if: matrix.system == 'aarch64-linux'
+        if: ${{ matrix.system == 'aarch64-linux' }}
         run: |
           sudo apt update
           sudo apt install -y qemu-user-static
 
-      - name: Install Nix
-        if: matrix.system != 'aarch64-linux'
-        uses: DeterminateSystems/nix-installer-action@v14
+      - name: Install Lix
+        if: ${{ matrix.system != 'aarch64-linux' }}
+        env:
+          NIX_INSTALLER_EXTRA_CONF: |
+            trusted-user = root worker
+            experimental-features = nix-command flakes
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf -L https://install.lix.systems/lix | sh -s -- install linux --no-confirm
+          sudo systemctl restart nix-daemon
 
-      - name: Install Nix (with aarch64)
-        if: matrix.system == 'aarch64-linux'
-        uses: DeterminateSystems/nix-installer-action@v14
-        with:
-          extra-conf: "extra-platforms = aarch64-linux arm-linux"
+      - name: Enable aarch64-linux support
+        if: ${{ matrix.system == 'aarch64-linux' }}
+        run: |
+          echo "extra-platforms = aarch64-linux arm-linux" | sudo tee -a /etc/nix/nix.conf
+          sudo systemctl restart nix-daemon
 
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
@@ -78,8 +84,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v14
+      - name: Install Lix
+        env:
+          NIX_INSTALLER_EXTRA_CONF: |
+            trusted-user = root worker
+            experimental-features = nix-command flakes
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf -L https://install.lix.systems/lix | sh -s -- install linux --no-confirm
+          sudo systemctl restart nix-daemon
 
       - name: Run check
         run: |
