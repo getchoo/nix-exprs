@@ -70,6 +70,14 @@
       );
 
       flakeModules = {
+        checks = mkModule {
+          name = "checks";
+          type = "flake";
+          imports = [ ./modules/flake/checks.nix ];
+          key = "${self.outPath}/flake.nix#flakeModules.checks";
+          _class = "flake";
+        };
+
         configs = mkModule {
           name = "configs";
           type = "flake";
