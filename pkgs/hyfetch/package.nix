@@ -21,28 +21,21 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "hyfetch";
-  version = "1.99.0-unstable-2024-10-23";
+  version = "1.99.0-unstable-2024-10-29";
 
   src = fetchFromGitHub {
     owner = "hykilpikonna";
     repo = "hyfetch";
-    rev = "b5b49ecbc095ac20e49c0783121c885752df9001";
-    hash = "sha256-W1oMzLACGDvcl8du4L3TuUn79i6HFUFuPEJhc3IPD0E=";
+    rev = "e630b7837fd4d09fadf377413e1ffa44fa80f9b6";
+    hash = "sha256-WPJzLm27Ourt5KddMCwt7TuuFTz4TIIm5yd5E8NiQmI=";
   };
 
-  # https://github.com/hykilpikonna/hyfetch/pull/361
-  #
-  # Upstream will call `neowofetch` with Bash (from the PATH) by default
-  # We know `neowofetch` has a shebang though, so run it directly to avoid
-  # adding Bash to the wrapper
-  #
-  # Yes, this introduces 2 warnings
-  postPatch = ''
-    substituteInPlace crates/hyfetch/src/neofetch_util.rs \
-      --replace-fail 'command.arg(neofetch_path)' 'let mut command = Command::new(neofetch_path)'
-  '';
+  cargoHash = "sha256-PfPTlmqTxVk4EIzLzaLD6UoD/z43TxtjDmv32bAPwT8=";
 
-  cargoHash = "sha256-4Tz6hqzjlCT5PSa1AzWGU6mBHWxMcsJm9+Uzmsvurps=";
+  outputs = [
+    "out"
+    "man"
+  ];
 
   strictDeps = true;
 
@@ -57,7 +50,10 @@ rustPlatform.buildRustPackage rec {
     ++ lib.optional withColor "color"
     ++ lib.optional withMacchina "macchina";
 
-  cargoBuildFlags = [ "--package hyfetch" ];
+  cargoBuildFlags = [
+    "--package"
+    "hyfetch"
+  ];
   cargoTestFlags = cargoBuildFlags;
 
   postInstall = ''
