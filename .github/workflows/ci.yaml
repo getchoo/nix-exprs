@@ -37,11 +37,11 @@ jobs:
 
       - name: Install Nix
         if: matrix.system != 'aarch64-linux'
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
 
       - name: Install Nix (with aarch64)
         if: matrix.system == 'aarch64-linux'
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
         with:
           extra-conf: "extra-platforms = aarch64-linux arm-linux"
 
@@ -78,7 +78,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
 
       - name: Run check
         run: |
