@@ -1,7 +1,7 @@
-# nix-exprs
+# getchpkgs
 
-[![Build status](https://img.shields.io/github/actions/workflow/status/getchoo/nix-exprs/ci.yaml?style=flat-square&logo=github&label=Build%20status&color=5277c3)](https://github.com/getchoo/nix-exprs/actions/workflows/ci.yaml)
-[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/getchoo/nix-exprs/badge)](https://flakehub.com/flake/getchoo/nix-exprs)
+[![Build status](https://img.shields.io/github/actions/workflow/status/getchoo/getchpkgs/ci.yaml?style=flat-square&logo=github&label=Build%20status&color=5277c3)](https://github.com/getchoo/getchpkgs/actions/workflows/ci.yaml)
+[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/getchoo/getchpkgs/badge)](https://flakehub.com/flake/getchoo/getchpkgs)
 
 My nix expressions not quite ready for nixpkgs yet - if ever
 
@@ -47,7 +47,7 @@ your own revision of nixpkgs
     };
 
     getchoo = {
-      url = "github:getchoo/nix-exprs";
+      url = "github:getchoo/getchpkgs";
       # this will break reproducibility, but lower the instances of nixpkgs
       # in flake.lock and possibly duplicated dependencies
       # inputs.nixpkgs.follows = "nixpkgs";
@@ -87,7 +87,7 @@ The best way to make these packages available for you is to
 add it to your flake registry like so:
 
 ```console
-$ nix registry add getchoo 'github:getchoo/nix-exprs'
+$ nix registry add getchoo 'github:getchoo/getchpkgs'
 $ nix profile install 'getchoo#treefetch'
 $ nix shell 'getchoo#treefetch'
 ```
@@ -99,7 +99,7 @@ There are two main ways to use this repository with stable Nix: channels and [`n
 To add the channel, run:
 
 ```console
-$ nix-channel --add https://github.com/getchoo/nix-exprs/archive/main.tar.gz getchoo
+$ nix-channel --add https://github.com/getchoo/getchpkgs/archive/main.tar.gz getchoo
 $ nix-channel --update getchoo
 ```
 
@@ -107,7 +107,7 @@ To use `npins`, please view their [Getting Started guide](https://github.com/and
 After, run:
 
 ```console
-$ npins add --name getchoo github getchoo nix-exprs
+$ npins add --name getchoo github getchoo getchpkgs
 ```
 
 #### Installing Packages
