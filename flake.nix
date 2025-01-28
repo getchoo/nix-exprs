@@ -9,38 +9,21 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs =
-    {
-      self,
-      nixpkgs,
-    }:
+    { self, nixpkgs }:
+
     let
       inherit (nixpkgs) lib;
 
       # Support all systems exported by Nixpkgs
       systems = lib.systems.flakeExposed;
       # But separate our primarily supported systems
-      tier1Systems = with lib.platforms; lib.intersectLists (aarch64 ++ aarch64) (darwin ++ linux);
+      tier1Systems = with lib.platforms; lib.intersectLists (aarch64 ++ x86_64) (darwin ++ linux);
 
       forAllSystems = lib.genAttrs systems;
       forTier1Systems = lib.genAttrs tier1Systems;
       nixpkgsFor = nixpkgs.legacyPackages;
-
-      mkModule =
-        {
-          name,
-          type,
-          imports,
-          ...
-        }@args:
-        {
-          _file = "${self.outPath}/flake.nix#${type}Modules.${name}";
-          inherit imports;
-        }
-        // lib.removeAttrs args [
-          "name"
-          "type"
-        ];
     in
+
     {
       checks = forTier1Systems (
         system:
@@ -60,39 +43,34 @@
 
       packages = forAllSystems (
         system:
+
         let
           pkgs = nixpkgsFor.${system};
 
-          isAvailable = lib.meta.availableOn { inherit system; };
-          pkgs' = lib.filterAttrs (lib.const isAvailable) (import ./default.nix { inherit pkgs; });
+          getchpkgs = import ./default.nix { inherit pkgs; };
+
+          getchpkgs' = lib.filterAttrs (lib.const (
+            deriv:
+            let
+              isCross = deriv.stdenv.buildPlatform != deriv.stdenv.hostPlatform;
+              availableOnHost = lib.meta.availableOn pkgs.stdenv.hostPlatform deriv;
+              # `nix flake check` doesn't like broken packages
+              isBroken = deriv.meta.broken or false;
+            in
+            isCross || availableOnHost && (!isBroken)
+          )) getchpkgs;
         in
-        pkgs' // { default = pkgs'.treefetch or pkgs.emptyFile; }
+
+        getchpkgs' // { default = getchpkgs'.treefetch or pkgs.emptyFile; }
       );
 
       flakeModules = {
-        checks = mkModule {
-          name = "checks";
-          type = "flake";
-          imports = [ ./modules/flake/checks.nix ];
-          key = "${self.outPath}/flake.nix#flakeModules.checks";
-          _class = "flake";
-        };
-
-        configs = mkModule {
-          name = "configs";
-          type = "flake";
-          imports = [ ./modules/flake/configs.nix ];
-          key = "${self.outPath}/flake.nix#flakeModules.configs";
-          _class = "flake";
-        };
+        checks = self + "./modules/flake/checks.nix";
+        configs = self + "./modules/flake/configs.nix";
       };
 
       homeModules = {
-        riff = mkModule {
-          name = "riff";
-          type = "home";
-          imports = [ ./modules/home/riff.nix ];
-        };
+        riff = self + "/modules/home/riff.nix";
       };
 
       formatter = forTier1Systems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
@@ -100,7 +78,7 @@
       templates =
         let
           toTemplate = name: description: {
-            path = ./templates + "/${name}";
+            path = self + "/templates/${name}";
             inherit description;
           };
         in
