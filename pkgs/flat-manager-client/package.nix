@@ -7,7 +7,7 @@
   wrapGAppsNoGuiHook,
 }:
 
-stdenvNoCC.mkDerivation (finalAttrs: {
+stdenvNoCC.mkDerivation {
   pname = "flat-manager-client";
   inherit (flat-manager) version src;
 
@@ -48,4 +48,4 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     description = flat-manager.meta.description + " (Client)";
     mainProgram = "flat-manager-client";
   };
-})
+}

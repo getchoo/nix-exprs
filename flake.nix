@@ -15,9 +15,9 @@
       inherit (nixpkgs) lib;
 
       # Support all systems exported by Nixpkgs
-      systems = lib.systems.flakeExposed;
+      systems = lib.intersectLists lib.systems.flakeExposed (with lib.platforms; darwin ++ linux);
       # But separate our primarily supported systems
-      tier1Systems = with lib.platforms; lib.intersectLists (aarch64 ++ x86_64) (darwin ++ linux);
+      tier1Systems = lib.intersectLists systems (with lib.platforms; aarch64 ++ x86_64);
 
       forAllSystems = lib.genAttrs systems;
       forTier1Systems = lib.genAttrs tier1Systems;
@@ -32,11 +32,14 @@
 
           mkCheck =
             name: deps: script:
-            pkgs.runCommand name { nativeBuildInputs = deps; } script;
+            pkgs.runCommand name { nativeBuildInputs = deps; } ''
+              ${script}
+              touch $out
+            '';
         in
         {
           deadnix = mkCheck "check-deadnix" [ pkgs.deadnix ] "deadnix --fail ${self}";
-          nixfmt = mkCheck "check-nixfmt" [ pkgs.nixfmt-rfc-style ] "nixfmt --check ${self}";
+          nixfmt = mkCheck "check-nixfmt" [ pkgs.nixfmt-rfc-style ] "nixfmt --check ${self}/**.nix";
           statix = mkCheck "check-statix" [ pkgs.statix ] "statix check ${self}";
         }
       );
@@ -86,5 +89,11 @@
           standard = "Minimal boilerplate for my Flakes";
           nixos = "Minimal boilerplate for a Flake-based NixOS configuration";
         };
+
+      hydraJobs = forTier1Systems (system: {
+        all-packages = nixpkgsFor.${system}.linkFarm "all-packages" (
+          lib.mapAttrs (lib.const (deriv: deriv.outPath or deriv)) self.packages.${system}
+        );
+      });
     };
 }
