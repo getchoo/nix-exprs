@@ -20,7 +20,7 @@ jobs:
             system: aarch64-darwin
           - os: macos-13
             system: x86_64-darwin
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             system: aarch64-linux
 
     runs-on: ${{ matrix.os }}
@@ -29,21 +29,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup QEMU
-        if: matrix.system == 'aarch64-linux'
-        run: |
-          sudo apt update
-          sudo apt install -y qemu-user-static
-
       - name: Install Nix
-        if: matrix.system != 'aarch64-linux'
         uses: DeterminateSystems/nix-installer-action@v16
-
-      - name: Install Nix (with aarch64)
-        if: matrix.system == 'aarch64-linux'
-        uses: DeterminateSystems/nix-installer-action@v16
-        with:
-          extra-conf: "extra-platforms = aarch64-linux arm-linux"
 
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
