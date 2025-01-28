@@ -15,9 +15,12 @@
 }:
 
 let
-  binPath = [
-    neowofetch
-  ] ++ lib.optional withFastfetch fastfetch ++ lib.optional withMacchina macchina;
+  binPath =
+    [
+      neowofetch
+    ]
+    ++ lib.optional withFastfetch fastfetch
+    ++ lib.optional withMacchina macchina;
 in
 rustPlatform.buildRustPackage rec {
   pname = "hyfetch";
