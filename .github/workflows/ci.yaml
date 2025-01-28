@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
   workflow_dispatch:
 
@@ -38,45 +38,22 @@ jobs:
           name: getchoo
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Evaluate flake
+      - name: Run Flake checks
+        if: ${{ matrix.system == 'x86_64-linux' }}
         run: |
-          nix flake check \
-            --no-build \
-            --show-trace
+          nix flake check --show-trace
 
-      - name: Run build
+      - name: Build all packages
+        env:
+          SYSTEM: ${{ matrix.system }}
         run: |
-          nix run \
-            github:Mic92/nix-fast-build -- \
-            --no-nom \
-            --skip-cached \
-            --systems '${{ matrix.system }}' \
-            --option accept-flake-config true \
-            --option allow-import-from-derivation false \
-            --flake '.#packages.${{ matrix.system }}'
+          nix build \
+            --fallback --print-build-logs --show-trace \
+            ".#hydraJobs.$SYSTEM.all-packages"
 
-  check:
-    name: Check flake
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-
-      - name: Run check
-        run: |
-          nix flake check \
-            --accept-flake-config \
-            --print-build-logs \
-            --show-trace
-
-  build-gate:
-    name: Build gate
-    needs: build
+  release-gate:
+    name: Release gate
+    needs: [ build ]
 
     if: ${{ always() }}
 
