@@ -52,16 +52,25 @@
 
           getchpkgs = import ./default.nix { inherit pkgs; };
 
-          getchpkgs' = lib.filterAttrs (lib.const (
-            deriv:
-            let
-              isCross = deriv.stdenv.buildPlatform != deriv.stdenv.hostPlatform;
-              availableOnHost = lib.meta.availableOn pkgs.stdenv.hostPlatform deriv;
-              # `nix flake check` doesn't like broken packages
-              isBroken = deriv.meta.broken or false;
-            in
-            isCross || availableOnHost && (!isBroken)
-          )) getchpkgs;
+          getchpkgs' =
+            # Find valid installables
+            lib.filterAttrs
+              (lib.const (
+                deriv:
+                let
+                  isCross = deriv.stdenv.buildPlatform != deriv.stdenv.hostPlatform;
+                  availableOnHost = lib.meta.availableOn pkgs.stdenv.hostPlatform deriv;
+                  # `nix flake check` doesn't like broken packages
+                  isBroken = deriv.meta.broken or false;
+                  isFunction = lib.isFunction deriv;
+                in
+                (!isFunction) && (isCross || availableOnHost) && (!isBroken)
+              ))
+              # Flatten `firefox-addons` package set
+              (
+                lib.removeAttrs getchpkgs [ "firefox-addons" ]
+                // lib.mapAttrs' (name: lib.nameValuePair "firefox-addons-${name}") getchpkgs.firefox-addons
+              );
         in
 
         getchpkgs' // { default = getchpkgs'.treefetch or pkgs.emptyFile; }
