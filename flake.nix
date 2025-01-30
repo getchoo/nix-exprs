@@ -68,12 +68,17 @@
       );
 
       flakeModules = {
-        checks = self + "./modules/flake/checks.nix";
-        configs = self + "./modules/flake/configs.nix";
+        checks = self + "/modules/flake/checks.nix";
+        configs = self + "/modules/flake/configs.nix";
       };
 
       homeModules = {
         riff = self + "/modules/home/riff.nix";
+        firefox-addons = self + "/modules/home/firefox-addons.nix";
+      };
+
+      nixosModules = {
+        firefox-addons = self + "/modules/nixos/firefox-addons.nix";
       };
 
       formatter = forTier1Systems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
