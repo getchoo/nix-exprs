@@ -17,9 +17,9 @@ of Flakes or in a system configuration.
 <summary>Example</summary>
 
 ```nix
-{ pkgs, ... }: {
+{
   nix.settings = {
-    trusted-substituters = [ "https://getchoo.cachix.org" ];
+    substituters = [ "https://getchoo.cachix.org" ];
     trusted-public-keys = [ "getchoo.cachix.org-1:ftdbAUJVNaFonM0obRGgR5+nUmdLMM+AOvDOSx0z5tE=" ];
   };
 }
@@ -39,37 +39,39 @@ your own revision of nixpkgs
 ```nix
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    getchoo = {
+    getchpkgs = {
       url = "github:getchoo/getchpkgs";
       # this will break reproducibility, but lower the instances of nixpkgs
       # in flake.lock and possibly duplicated dependencies
       # inputs.nixpkgs.follows = "nixpkgs";
-      # if you want to save some space
-      # inputs.flake-checks.follows = "";
     };
   };
 
   outputs =
-    { nixpkgs, getchoo, ... }:
+    { nixpkgs, getchpkgs, ... }:
+
     {
-      nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.myMachine = nixpkgs.lib.nixosSystem {
         modules = [
           ./configuration.nix
+
           (
             { pkgs, ... }:
+
             let
               inherit (pkgs.stdenv.hostPlatform) system;
             in
+
             {
               environment.systemPackages = [
-                getchoo.packages.${system}.treefetch
+                getchpkgs.packages.${system}.treefetch
               ];
             }
           )
@@ -87,9 +89,9 @@ The best way to make these packages available for you is to
 add it to your flake registry like so:
 
 ```console
-$ nix registry add getchoo 'github:getchoo/getchpkgs'
-$ nix profile install 'getchoo#treefetch'
-$ nix shell 'getchoo#treefetch'
+$ nix registry add getchpkgs 'github:getchoo/getchpkgs'
+$ nix profile install 'getchpkgs#treefetch'
+$ nix shell 'getchpkgs#treefetch'
 ```
 
 ### Stable Nix
@@ -99,32 +101,36 @@ There are two main ways to use this repository with stable Nix: channels and [`n
 To add the channel, run:
 
 ```console
-$ nix-channel --add https://github.com/getchoo/getchpkgs/archive/main.tar.gz getchoo
-$ nix-channel --update getchoo
+$ nix-channel --add https://github.com/getchoo/getchpkgs/archive/main.tar.gz getcpkgs
+$ nix-channel --update getchpkgs
 ```
 
 To use `npins`, please view their [Getting Started guide](https://github.com/andir/npins?tab=readme-ov-file#getting-started) to initialize your project.
 After, run:
 
 ```console
-$ npins add --name getchoo github getchoo getchpkgs
+$ npins add github getchoo getchpkgs
 ```
 
 #### Installing Packages
 
 ```nix
-{ pkgs, ... }: let
+{ pkgs, ... }:
+
+let
   # If you use channels
-  getchoo = import <getchoo> {
+  getcpkgs = import <getchpkgs> {
     # Add this if you want to use your own nixpkgs
     inherit pkgs;
   };
 
   # Or if you use `npins`
   # sources = import ./npins;
-  # getchoo = import sources.getchoo { };
-in {
-  environment.systemPackages = [ getchoo.treefetch ];
+  # getchoo = import sources.getchpkgs { };
+in
+
+{
+  environment.systemPackages = [ getchpkgs.treefetch ];
 }
 ```
 
@@ -133,6 +139,6 @@ in {
 Channels are the recommended method of adhoc-installation and usage. After adding it with the command above, you can use it like so:
 
 ```console
-$ nix-env -f '<getchoo>' -iA treefetch
-$ nix-shell '<getchoo>' -p treefetch
+$ nix-env -f '<getchpkgs>' -iA treefetch
+$ nix-shell '<getchpkgs>' -p treefetch
 ```
