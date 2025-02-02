@@ -8,12 +8,25 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    getchpkgs = {
+      url = "github:getchoo/getchpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
-    let
-      inherit (nixpkgs) lib;
+    inputs:
+
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.getchpkgs.flakeModules.configurations
+      ];
 
       systems = [
         "x86_64-linux"
@@ -22,37 +35,33 @@
         "aarch64-darwin"
       ];
 
-      forAllSystems = lib.genAttrs systems;
-      nixpkgsFor = nixpkgs.legacyPackages;
-    in
-    {
-      nixosConfigurations.myComputer = nixpkgs.lib.nixosSystem {
-        modules = [ ./configuration.nix ]; # You should already have this
-        specialArgs = {
-          # Gives your configuration.nix access to the inputs from above
-          inherit inputs;
+      configurations = {
+        nixos = {
+          my-machine = {
+            # You should already have this file in /etc/nixos
+            modules = [ ./configuration.nix ];
+          };
         };
       };
 
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgsFor.${system};
-        in
+      perSystem =
+        { pkgs, self', ... }:
+
         {
-          default = pkgs.mkShellNoCC {
-            packages = [
-              pkgs.fzf
-              pkgs.just
+          # Use `nix develop` to enter a shell with tools for this repository
+          devShells = {
+            default = pkgs.mkShellNoCC {
+              packages = [
+                pkgs.just
 
-              # Lets you run `nixfmt` to format all of your files
-              self.formatter.${system}
-            ];
+                # Lets you run `nixfmt` to format all of your files
+                self'.formatter
+              ];
+            };
           };
-        }
-      );
 
-      # You can also use `nix fmt`
-      formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
+          # You can also use `nix fmt`
+          formatter = pkgs.nixfmt-rfc-style;
+        };
     };
 }
