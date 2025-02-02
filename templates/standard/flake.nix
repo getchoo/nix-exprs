@@ -5,6 +5,7 @@
 
   outputs =
     { self, nixpkgs }:
+
     let
       inherit (nixpkgs) lib;
 
@@ -16,54 +17,57 @@
       ];
 
       forAllSystems = lib.genAttrs systems;
-      nixpkgsFor = nixpkgs.legacyPackages;
     in
+
     {
       checks = forAllSystems (
         system:
+
         let
-          pkgs = nixpkgsFor.${system};
+          pkgs = nixpkgs.legacyPackages.${system};
 
           mkCheck =
             name: deps: script:
-            pkgs.runCommand name { nativeBuildInputs = deps; } script;
+            pkgs.runCommand name { nativeBuildInputs = deps; } ''
+              ${script}
+              touch $out
+            '';
         in
-        {
-          nixfmt = mkCheck "check-nixfmt" [ pkgs.nixfmt-rfc-style ] ''
-            nixfmt --check ${self}
 
-            touch $out
-          '';
+        {
+          nixfmt = mkCheck "check-nixfmt" [ pkgs.nixfmt-rfc-style ] "nixfmt --check ${self}/**.nix";
         }
       );
 
       devShells = forAllSystems (
         system:
-        let
-          pkgs = nixpkgsFor.${system};
-        in
-        {
-          default = pkgs.mkShell {
-            packages = [ pkgs.bash ];
 
-            inputsFrom = [ self.packages.${system}.hello ];
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+
+        {
+          default = import ./shell.nix {
+            inherit pkgs;
+            inherit (self.packages.${system}) hello;
           };
         }
       );
 
-      formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+
+      nixosModules.default = lib.modules.importApply ./nix/module.nix { inherit self; };
 
       packages = forAllSystems (
         system:
-        let
-          pkgs = import ./default.nix {
-            pkgs = nixpkgsFor.${system};
-          };
 
-          isAvailable = lib.meta.availableOn { inherit system; };
-          pkgs' = lib.filterAttrs (_: isAvailable) pkgs;
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+
+          pkgs' = import ./default.nix { inherit pkgs; };
         in
-        pkgs // { default = pkgs'.hello or pkgs.emptyFile; }
+
+        pkgs' // { default = pkgs'.hello or pkgs.emptyFile; }
       );
     };
 }

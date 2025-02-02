@@ -6,16 +6,11 @@
   },
   nixpkgs ? <nixpkgs>,
   system ? builtins.currentSystem,
+  hello ? (import ./default.nix { inherit pkgs; }).hello,
 }:
 
-let
-  inherit (pkgs) lib;
+pkgs.mkShell {
+  packages = [ pkgs.bash ];
 
-  callPackage = lib.callPackageWith (pkgs // pkgs');
-
-  pkgs' = {
-    hello = callPackage ./nix/package.nix { };
-  };
-in
-
-pkgs'
+  inputsFrom = [ hello ];
+}
