@@ -69,7 +69,7 @@
 
       flakeModules = {
         checks = self + "/modules/flake/checks.nix";
-        configs = self + "/modules/flake/configs.nix";
+        configurations = self + "/modules/flake/configurations.nix";
       };
 
       homeModules = {
